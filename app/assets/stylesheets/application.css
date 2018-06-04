@@ -1,0 +1,79 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f2f2f2;
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
+
+h1 {
+  text-align: center;
+  color: #ff3300;
+  font-family: cursive;
+}
+
+#board {
+  margin: auto;
+  width: 480px;
+  font-size: 0;
+}
+
+.tile, .rack-tile {
+  font-weight: bold;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  padding: 5px;
+  padding-left: 9px;
+  font-size: 20px;
+  text-align: center;
+  vertical-align: bottom;
+  border: 1px solid white;
+}
+
+#rack {
+  width: 224px;
+  margin: auto;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+sub {
+  color: #64403d;
+  font-size: 9px;
+}
+
+#buttons {
+  text-align: center;
+}
+
+button {
+  display: inline-block;
+  border: none;
+  width: 100px;
+  height: 30px;
+  margin-top: 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #666699;
+}

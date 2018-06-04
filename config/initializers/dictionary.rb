@@ -1,0 +1,1 @@
+DICT = File.open("./vendor/sowpods.txt").read.split("\n")
