@@ -104,11 +104,6 @@ let Game = function() {
 
           wordsAsString = that.words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
 
-          console.log(that.wordTiles);
-          console.log(word);
-          console.log(that.words);
-          console.log(wordsAsString);
-
           App.game.validate_words(wordsAsString);
 
         } else {
@@ -668,7 +663,11 @@ let Game = function() {
 
       // set the wild tile if any
       if (node.getElementsByTagName('span')[0].textContent === ' ') {
-        node.getElementsByTagName('span')[0].textContent = this.askForWildTile();
+        let toBeReplaced = this.askForWildTile();
+        node.getElementsByTagName('span')[0].textContent = toBeReplaced;
+        
+        App.game.make_move(node.id + " " + toBeReplaced + "*");
+
       }
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
@@ -794,11 +793,21 @@ let Game = function() {
   }
 
   this.placeTile = function(id, letter) {
+    // If the letter to be placed is wild tile, '*' is appended to the letter
+    letter = letter.split("");
+
     let tile = document.getElementById(id);
     tile.draggable = false;
     tile.innerHTML = '<span></span><sub></sub>';
-    tile.getElementsByTagName('span')[0].textContent = letter;
-    tile.lastChild.textContent = this.letterPoints[letter];
+    tile.getElementsByTagName('span')[0].textContent = letter.split("")[0];
+    
+    // If the letter to be placed is wild tile, length is two
+    if (letter.length > 1) {
+      tile.lastChild.textContent = 0;
+    } else {
+      tile.lastChild.textContent = this.letterPoints[letter];
+    }
+
     this.determineTileBackground(tile);
   }
 

@@ -39,10 +39,6 @@ class Game < ApplicationRecord
     ActionCable.server.broadcast "player_#{opponent}", {action: "remove_tile", msg: id['data']}
   end
 
-  def self.opponent_for(uuid)
-    REDIS.get("opponent_for:#{uuid}")
-  end
-
   def self.pass_letters(uuid, params)
     bag = REDIS.get("game_bag_#{params["data"]["gameId"]}")
     bag = Bag.put_back(bag, params["data"]["letters"])
@@ -67,5 +63,9 @@ class Game < ApplicationRecord
     if is_validated
       ActionCable.server.broadcast "player_#{uuid}", {action: "process_valid_words", msg: ""}
     end
+  end
+
+  def self.opponent_for(uuid)
+    REDIS.get("opponent_for:#{uuid}")
   end
 end
