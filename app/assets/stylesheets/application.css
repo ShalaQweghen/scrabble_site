@@ -46,6 +46,7 @@ h1 {
   text-align: center;
   vertical-align: bottom;
   border: 1px solid white;
+  cursor: pointer;
 }
 
 #rack {

@@ -27,4 +27,12 @@ class GameChannel < ApplicationCable::Channel
   def validate_words(data)
     Game.validate_words(uuid, data)
   end
+
+  def challenge
+    Game.challenge(uuid)
+  end
+
+  def return_back_letters(data)
+    Game.return_back_letters(uuid, data)
+  end
 end

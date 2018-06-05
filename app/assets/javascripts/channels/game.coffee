@@ -8,9 +8,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   received: (data) ->
     switch data.action
       when "game_start"
-        [toGo, opponent, bag, game_id] = data.msg.split(' ')
+        [toGo, opponent, bag, game_id, challengable] = data.msg.split(' ')
         App.gamePlay = new Game()
-        App.gamePlay.init(game_id, bag.split(''), opponent, toGo == "first")
+        App.gamePlay.init(game_id, bag.split(''), opponent, toGo == "first", true)
         @printMessage("Game has started! You play #{toGo}")
       when "make_move"
         [tile, letter] = data.msg.split(" ")
@@ -25,6 +25,8 @@ App.game = App.cable.subscriptions.create "GameChannel",
         App.gamePlay.processValidWords()
       when "process_invalid_words"
         App.gamePlay.processInvalidWords(data.msg)
+      when "challenge"
+        App.gamePlay.challenge()
         
   printMessage: (message) ->
     $("#messages").append("<p>#{message}</p>")
@@ -43,3 +45,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
 
   validate_words: (word) ->
     @perform 'validate_words', data: word
+
+  challenge: ->
+    @perform 'challenge'
+
+  return_back_letters: (gameId, letters) ->
+    @perform 'return_back_letters', data: { gameId, letters }

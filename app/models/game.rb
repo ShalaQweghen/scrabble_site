@@ -65,6 +65,17 @@ class Game < ApplicationRecord
     end
   end
 
+  def self.challenge(uuid)
+    opponent = opponent_for(uuid)
+    ActionCable.server.broadcast "player_#{opponent}", {action: "challenge", msg: nil}
+  end
+
+  def self.return_back_letters(uuid, letters_data)
+    bag = REDIS.get("game_bag_#{letters_data["data"]["gameId"]}")
+    bag = Bag.put_back(bag, letters_data["data"]["letters"])
+    REDIS.set("game_bag_#{letters_data["data"]["gameId"]}", bag)
+  end
+
   def self.opponent_for(uuid)
     REDIS.get("opponent_for:#{uuid}")
   end

@@ -1,19 +1,31 @@
 let Game = function() {
-  this.init = function(gameId, letters, opponent, firstToGo) {
+  this.init = function(gameId, letters, opponent, firstToGo, challengable) {
     this.gameId = gameId;
     this.opponent = opponent;
-    this.rackTiles = [];
+
     this.letterClicked = '';
     this.dragged = null;
+    this.opponentWord = "";
+
+    this.drawnLetters = [];
+    this.rackTiles = [];
+    this.wildTile = '';
     this.wordTiles = [];
     this.prevWordTiles = [];
+
     this.word = '';
     this.words = [];
-    this.totalPoints = [];
-    this.wildTile = '';
+    this.prevWords = [];
+
     this.isFirstMove = firstToGo;
     this.myTurn = firstToGo;
     this.passedLetters = [];
+    this.challengable = challengable;
+    this.challenged = false;
+
+    this.turnScore = 0;
+    this.totalScore = 0;
+    this.prevTurnScore = 0;
 
     this.letterPoints = {};
     'LSUNRTOAIE'.split('').forEach(l => this.letterPoints[l] = 1);
@@ -100,11 +112,14 @@ let Game = function() {
         that.cleanWordTiles();
 
         if (that.isValidPlacement()) {
-          word = that.produceWord();
+          that.word = that.produceWord();
 
-          wordsAsString = that.words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
-
-          App.game.validate_words(wordsAsString);
+          if (that.challengable) {
+            that.processValidWords();
+          } else {
+            wordsAsString = that.words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+            App.game.validate_words(wordsAsString);
+          }
 
         } else {
           App.game.printMessage("Tile placement is not valid!");
@@ -127,49 +142,99 @@ let Game = function() {
     });
     buttons.appendChild(pass);
 
-    let challenge = document.createElement("button");
-    challenge.textContent = "Challenge";
+    if (this.challengable) {
+      let challenge = document.createElement("button");
+      challenge.textContent = "Challenge";
+      challenge.addEventListener('click', function() {
+        if (that.myTurn) {
+          App.game.challenge();
+        }
+      })
+
+      buttons.appendChild(challenge);
+    }
 
     let shuf = document.createElement('button');
     shuf.textContent = "Shuffle";
     shuf.addEventListener('click', function() {
-      let letters = [];
+      let tiles = [];
 
-      // get letters from tile nodes
+      // get tiles from tile nodes
       for (let i = 0; i < that.rackTiles.length; i++) {
-        letters.push(that.rackTiles[i].getElementsByTagName('span')[0].textContent)
+        tiles.push(that.rackTiles[i].innerHTML)
       }
 
-      shuffle(letters);
+      shuffle(tiles);
 
       // place letter values to tile nodes
       for (let i = 0; i < that.rackTiles.length; i++) {
-        that.rackTiles[i].getElementsByTagName('span')[0].textContent = letters[i];
-        that.rackTiles[i].lastChild.textContent = that.letterPoints[letters[i]];
+        that.rackTiles[i].innerHTML = tiles[i];
         that.determineTileBackground(that.rackTiles[i]);
       }
     });
     buttons.appendChild(shuf);
   }
 
+  this.challenge = function() {
+    this.challenged = true;
+    let wordsAsString = this.prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+    App.game.validate_words(wordsAsString + " " + this.word);
+  }
+
   this.processValidWords = function() {
-    this.totalPoints += this.calcPoints();
-    this.deactivateWordTiles();
-    this.resetTurn();
+    if (this.challenged) {
+      this.challenged = false;
+      App.game.switch_turn(this.gameId, 0);
+    } else {
+      this.totalScore += this.calcPoints();
+      this.deactivateWordTiles();
+      this.resetTurn();
 
-    if (this.isFirstMove) {
-      this.isFirstMove = false;
+      if (this.isFirstMove) {
+        this.isFirstMove = false;
+      }
+
+      App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
     }
-
-    App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
   }
 
   this.processInvalidWords = function(word) {
+    if (this.challenged) {
+      this.challenged = false;
+      this.totalScore -= this.prevTurnScore;
+
+      this.activateWordTiles();
+      this.replaceRackTiles();
+
+      App.game.printMessage("You have been challenged!");
+    }
+
     this.words = [];
-    App.game.printMessage("'" + word + "'' is not a valid word!");
+    App.game.printMessage("'" + word + "' is not a valid word!");
+  }
+
+  this.replaceRackTiles = function() {
+    for (let i = 0; i < this.drawnLetters.length; i++) {
+      for (let j = 0; j < this.rackTiles.length; j++) {
+        if (this.drawnLetters[i] === this.rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
+          this.rackTiles[j].innerHTML = this.prevWordTiles[i].innerHTML;
+          this.prevWordTiles[i].innerHTML = "";
+          this.determineTileBackground(this.rackTiles[j]);
+          this.determineTileBackground(this.prevWordTiles[i]);
+
+          App.game.remove_tile(this.prevWordTiles[i].id);
+
+          break;
+        }
+      }
+    }
+
+    App.game.return_back_letters(this.gameId, this.drawnLetters);
   }
 
   this.populateRack = function(letters) {
+    this.drawnLetters = letters.slice();
+
     for (let i = 0; i < this.rackTiles.length; i++) {
       if (!this.rackTiles[i].innerHTML) {
         let letter = letters.pop()
@@ -296,6 +361,12 @@ let Game = function() {
     });
   }
 
+  this.activateWordTiles = function() {
+    for (let i = 0; i < this.prevWordTiles.length; i++) {
+      this.prevWordTiles[i].draggable = true;
+    }
+  }
+
   this.deactivateWordTiles = function() {
     for (let i = 0; i < this.wordTiles.length; i++) {
       this.wordTiles[i].draggable = false;
@@ -304,6 +375,7 @@ let Game = function() {
 
   this.resetTurn = function() {
     this.prevWordTiles = this.wordTiles;
+    this.prevWords = this.words;
     this.wordTiles = [];
     this.words = [];
   }
@@ -512,10 +584,8 @@ let Game = function() {
 
   this.produceWord = function() {
     if (this.isDownwards()) {
-      console.log(1);
       return this.isAdjacent() && this.produceDownwards();
     } else {
-      console.log(2);
       return this.isAdjacent() && this.produceSideways();
     }
   }
@@ -534,7 +604,7 @@ let Game = function() {
   }
 
   this.isValidPlacement = function() {
-    return (this.isFirstMove || this.isContinuation) && (this.isValidToRight() && !this.isValidDownwards()) || (this.isValidDownwards() && !this.isValidToRight());
+    return ((this.isFirstMove && this.wordTiles.length > 1) || this.isContinuation()) && ((this.isValidToRight() && !this.isValidDownwards()) || (this.isValidDownwards() && !this.isValidToRight()) || this.wordTiles.length === 1);
   }
 
   this.isValidToRight = function() {
@@ -546,7 +616,7 @@ let Game = function() {
       return that.extractLetter(tile) !== checkLetter && that.extractNumber(tile) === checkNumber;
     }
 
-    return this.wordTiles.slice(1).every(isValid) || this.wordTiles.length === 1;
+    return this.wordTiles.slice(1).every(isValid);
   }
 
   this.isValidDownwards = function() {
@@ -558,14 +628,14 @@ let Game = function() {
       return that.extractLetter(tile) === checkLetter && that.extractNumber(tile) !== checkNumber;
     }
 
-    return this.wordTiles.slice(1).every(isValid) || this.wordTiles.length === 1;
+    return this.wordTiles.slice(1).every(isValid);
   }
 
   this.isContinuation = function() {
     let that = this;
 
-    down = this.wordTiles.some(tile => that.collectWordTiles(that.extractNumber(tile), that.extractLetter(tile), true));
-    side = this.wordTiles.some(tile => that.collectWordTiles(that.extractNumber(tile), that.extractLetter(tile), false));
+    down = this.wordTiles.some(tile => that.collectWordTiles(that.extractNumber(tile), that.extractLetter(tile), true).length > 1);
+    side = this.wordTiles.some(tile => that.collectWordTiles(that.extractLetter(tile), that.extractNumber(tile), false).length > 1);
 
     return down || side;
   }
@@ -665,9 +735,8 @@ let Game = function() {
       if (node.getElementsByTagName('span')[0].textContent === ' ') {
         let toBeReplaced = this.askForWildTile();
         node.getElementsByTagName('span')[0].textContent = toBeReplaced;
-        
-        App.game.make_move(node.id + " " + toBeReplaced + "*");
 
+        App.game.make_move(node.id + " " + toBeReplaced + "*");
       }
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
@@ -711,7 +780,10 @@ let Game = function() {
 
       // set the wild tile if any
       if (node.getElementsByTagName('span')[0].textContent === ' ') {
-        node.getElementsByTagName('span')[0].textContent = this.askForWildTile();
+        let toBeReplaced = this.askForWildTile();
+        node.getElementsByTagName('span')[0].textContent = toBeReplaced;
+
+        App.game.make_move(node.id + " " + toBeReplaced + "*");
       }
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
@@ -744,6 +816,8 @@ let Game = function() {
 
     let points = 0;
     this.words.forEach(word => points += calcWordPoints(word));
+
+    this.prevTurnScore = points;
 
     return points;
   }
@@ -799,13 +873,13 @@ let Game = function() {
     let tile = document.getElementById(id);
     tile.draggable = false;
     tile.innerHTML = '<span></span><sub></sub>';
-    tile.getElementsByTagName('span')[0].textContent = letter.split("")[0];
+    tile.getElementsByTagName('span')[0].textContent = letter[0];
     
     // If the letter to be placed is wild tile, length is two
     if (letter.length > 1) {
       tile.lastChild.textContent = 0;
     } else {
-      tile.lastChild.textContent = this.letterPoints[letter];
+      tile.lastChild.textContent = this.letterPoints[letter[0]];
     }
 
     this.determineTileBackground(tile);
