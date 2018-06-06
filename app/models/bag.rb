@@ -29,18 +29,18 @@ class Bag
     transform(bag)
   end
 
-  def self.transform(bag)
-    if bag.is_a?(Array)
-      transformed_bag = ""
+  def self.transform(arr)
+    if arr.is_a?(Array)
+      transformed_arr = ""
 
-      bag.each do |l|
-        transformed_bag += l
+      arr.each do |l|
+        transformed_arr += l if l
       end
     else
-      transformed_bag = bag.split('')
+      transformed_arr = arr.split('')
     end
 
-    transformed_bag
+    transformed_arr
   end
 
   def self.complete_rack(amount, bag)

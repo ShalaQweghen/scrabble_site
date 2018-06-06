@@ -442,7 +442,7 @@ let Game = function() {
       let id = String.fromCharCode(tile.id.charCodeAt(0) + 1) + tile.id.slice(1);
       let node = document.getElementById(id);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         word.push(node)
         id = String.fromCharCode(id.charCodeAt(0) + 1) + id.slice(1);
         node = document.getElementById(id);
@@ -453,7 +453,7 @@ let Game = function() {
       let id = String.fromCharCode(tile.id.charCodeAt(0) - 1) + tile.id.slice(1);
       let node = document.getElementById(id);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         word.unshift(node)
         id = String.fromCharCode(id.charCodeAt(0) - 1) + id.slice(1);
         node = document.getElementById(id);
@@ -478,7 +478,7 @@ let Game = function() {
       let id = tile.id[0] + (that.extractNumber(tile) - 1);
       let node = document.getElementById(id);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         word.unshift(node)
         id = id[0] + (Number(id.slice(1)) - 1);
         node = document.getElementById(id);
@@ -489,7 +489,7 @@ let Game = function() {
       let id = tile.id[0] + (that.extractNumber(tile) + 1);
       let node = document.getElementById(id);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         word.push(node)
         id = id[0] + (Number(id.slice(1)) + 1);
         node = document.getElementById(id);
@@ -526,11 +526,16 @@ let Game = function() {
       let idNumbers = this.wordTiles.map(tile => that.extractNumber(tile));
 
       for(let i = 0; i < idNumbers.length; i++) {
-        if (idNumbers[i + 1] && idNumbers[i] + 1 != idNumbers[i + 1]) {
-          onBoard.push(idLetter + String(idNumbers[i] + 1));
+        let calculatedIdNumber = idNumbers[i] + 1;
 
-          while(idNumbers[i + 1] != this.extractNumber(onBoard[onBoard.length - 1]) + 1) {
-            onBoard.push(idLetter + String(this.extractNumber(onBoard[onBoard.length - 1]) + 1));
+        if (idNumbers[i + 1] && calculatedIdNumber != idNumbers[i + 1] && calculatedIdNumber < 15) {
+          onBoard.push(idLetter + String(calculatedIdNumber));
+
+          let lastIdNumber = this.extractNumber(onBoard[onBoard.length - 1]);
+
+          while(idNumbers[i + 1] != lastIdNumber + 1 && lastIdNumber + 1 < 15) {
+            lastIdNumber = lastIdNumber + 1;
+            onBoard.push(idLetter + String(lastIdNumber));
           }
         }
       }
@@ -539,23 +544,28 @@ let Game = function() {
       let idNumber = this.extractNumber(this.wordTiles[0]);
 
       for(let i = 0; i < idLetters.length; i++) {
-        if (idLetters[i + 1] && String.fromCharCode(idLetters[i].charCodeAt(0) + 1) != idLetters[i + 1]) {
-          onBoard.push(String.fromCharCode(idLetters[i].charCodeAt(0) + 1) + idNumber);
+        let calculatedIdLetter = String.fromCharCode(idLetters[i].charCodeAt(0) + 1);
 
-          while(idLetters[i + 1] != onBoard[onBoard.length - 1][0]) {
-            onBoard.push(String.fromCharCode(onBoard[onBoard.length - 1].charCodeAt(0) + 1) + idNumber);
+        if (idLetters[i + 1] && calculatedIdLetter != idLetters[i + 1] && calculatedIdLetter < 'o') {
+          onBoard.push(calculatedIdLetter + idNumber);
+
+          let lastId = onBoard[onBoard.length - 1];
+
+          while(idLetters[i + 1] != lastId[0] && lastId[0] < "o") {
+            onBoard.push(String.fromCharCode(lastId.charCodeAt(0) + 1) + idNumber);
+            lastId = onBoard[onBoard.length - 1];
           }
         }
       }
     }
-
+    
     return onBoard;
   }
 
   this.hasNoGaps = function() {
     let inBetweenTiles = this.getInBetweenTiles();
 
-    return inBetweenTiles.length && inBetweenTiles.every(id => document.getElementById(id).innerHTML);
+    return !inBetweenTiles.length || inBetweenTiles.every(id => document.getElementById(id).innerHTML);
   }
 
   this.isAdjacent = function() {
@@ -563,23 +573,43 @@ let Game = function() {
     let wordTilesIds = this.wordTiles.map(tile => tile.id);
 
     function isOccupiedRight(tile) {
-      let id = String.fromCharCode(tile.id.charCodeAt(0) + 1) + tile.id.slice(1);
-      return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML
+      if (that.extractLetter(tile) == "o") {
+        return false;
+      } else {
+        let id = String.fromCharCode(tile.id.charCodeAt(0) + 1) + tile.id.slice(1);
+        return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML;
+      }
     }
 
     function isOccupiedLeft(tile) {
-      let id = String.fromCharCode(tile.id.charCodeAt(0) - 1) + tile.id.slice(1);
-      return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML
+      if (that.extractLetter(tile) == "a") {
+        return false;
+      } else {
+        let id = String.fromCharCode(tile.id.charCodeAt(0) - 1) + tile.id.slice(1);
+        return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML;
+      }
     }
     
     function isOccupiedUp(tile) {
-      let id = tile.id[0] + (that.extractNumber(tile) - 1);
-      return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML
+      let numberPart = that.extractNumber(tile);
+
+      if (numberPart == 1) {
+        return false;
+      } else {
+        let id = tile.id[0] + (numberPart - 1);
+        return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML;
+      }
     }
 
     function isOccupiedDown(tile) {
-      let id = tile.id[0] + (that.extractNumber(tile) + 1);
-      return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML
+      let numberPart = that.extractNumber(tile);
+
+      if (numberPart == 15) {
+        return false;
+      } else {
+        let id = tile.id[0] + (numberPart + 1);
+        return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML;
+      }
     }
 
     return this.wordTiles.some(tile => (that.isFirstMove && tile.id === 'h8') || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && that.hasNoGaps()));
@@ -656,7 +686,7 @@ let Game = function() {
     if (downwards) {
       node = document.getElementById(affix + start);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         tiles.push(node.id);
         start += 1;
         node = document.getElementById(affix + start);
@@ -666,7 +696,7 @@ let Game = function() {
 
       node = document.getElementById(affix + start)
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         tiles.unshift(node.id);
         start -= 1;
         node = document.getElementById(affix + start);
@@ -675,7 +705,7 @@ let Game = function() {
     } else {
       node = document.getElementById(start + affix);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         tiles.push(node.id);
         start = String.fromCharCode(start.charCodeAt(0) + 1);
         node = document.getElementById(start + affix);
@@ -685,7 +715,7 @@ let Game = function() {
 
       node = document.getElementById(start + affix);
 
-      while (node.innerHTML) {
+      while (node && node.innerHTML) {
         tiles.unshift(node.id);
         start = String.fromCharCode(start.charCodeAt(0) - 1);
         node = document.getElementById(start + affix);
