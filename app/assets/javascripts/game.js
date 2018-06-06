@@ -185,7 +185,8 @@ let Game = function() {
     if (this.challenged) {
       this.challenged = false;
       App.game.switch_turn(this.gameId, 0);
-    } else {
+    } else if (this.word) {
+
       this.totalScore += this.calcPoints();
       this.deactivateWordTiles();
       this.resetTurn();
@@ -195,6 +196,8 @@ let Game = function() {
       }
 
       App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
+    } else {
+      App.game.printMessage("Tile placement is not valid!");
     }
   }
 
@@ -578,8 +581,8 @@ let Game = function() {
       let id = tile.id[0] + (that.extractNumber(tile) + 1);
       return !wordTilesIds.includes(id) && document.getElementById(id).innerHTML
     }
-    
-    return this.wordTiles.some(tile => (that.isFirstMove && tile.id === 'h8') || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) || that.hasNoGaps()));
+
+    return this.wordTiles.some(tile => (that.isFirstMove && tile.id === 'h8') || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && that.hasNoGaps()));
   }
 
   this.produceWord = function() {
@@ -634,8 +637,10 @@ let Game = function() {
   this.isContinuation = function() {
     let that = this;
 
-    down = this.wordTiles.some(tile => that.collectWordTiles(that.extractNumber(tile), that.extractLetter(tile), true).length > 1);
-    side = this.wordTiles.some(tile => that.collectWordTiles(that.extractLetter(tile), that.extractNumber(tile), false).length > 1);
+    let placedIds = this.wordTiles.map(tile => tile.id);
+
+    down = this.wordTiles.some(tile => that.collectWordTiles(that.extractNumber(tile), that.extractLetter(tile), true).filter(id => !placedIds.includes(id)).length);
+    side = this.wordTiles.some(tile => that.collectWordTiles(that.extractLetter(tile), that.extractNumber(tile), false).filter(id => !placedIds.includes(id)).length);
 
     return down || side;
   }
