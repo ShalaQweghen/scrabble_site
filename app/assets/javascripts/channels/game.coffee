@@ -18,10 +18,10 @@ App.game = App.cable.subscriptions.create "GameChannel",
       when "switch_turn"
         params = data.msg.split(" ")
 
-        if params.length == 2
-          App.gamePlay.switchTurn(params[0], params[1])
+        if params.length == 3
+          App.gamePlay.switchTurn(params[0], params[1], params[2])
         else
-          App.gamePlay.switchTurn("", params[0])
+          App.gamePlay.switchTurn("", params[0], params[1])
       when "remove_tile"
         App.gamePlay.removeTile(data.msg)
       when "pass_letters"
@@ -31,9 +31,13 @@ App.game = App.cable.subscriptions.create "GameChannel",
       when "process_invalid_words"
         App.gamePlay.processInvalidWords(data.msg)
       when "challenge"
-        App.gamePlay.challenge()
+        App.gamePlay.challenge(data.msg)
       when "deliver_score"
         App.gamePlay.updateScore(data.msg)
+      when "yield"
+        App.gamePlay.theEnd()
+      when "finish_game"
+        App.gamePlay.finishGame();
         
   printMessage: (message) ->
     $("#messages").html("<p>#{message}</p>")
@@ -53,11 +57,17 @@ App.game = App.cable.subscriptions.create "GameChannel",
   validate_words: (word) ->
     @perform 'validate_words', data: word
 
-  challenge: ->
-    @perform 'challenge'
+  challenge: (last) ->
+    @perform 'challenge', data: last
 
   return_back_letters: (gameId, letters) ->
     @perform 'return_back_letters', data: { gameId, letters }
 
   deliver_score: (score) ->
     @perform 'deliver_score', data: score
+
+  yield: ->
+    @perform 'yield'
+
+  finalize_game: ->
+    @perform 'finalize_game'

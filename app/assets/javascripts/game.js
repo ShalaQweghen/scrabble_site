@@ -27,10 +27,12 @@ let Game = function() {
     this.challenged = false;
     this.challenging = false;
     this.mayChallenge = true;
+    this.aboutToFinish = false;
 
     this.turnScore = 0;
     this.totalScore = 0;
     this.prevTurnScore = 0;
+    this.opponentScore = 0;
 
     this.letterPoints = {};
     'LSUNRTOAIE'.split('').forEach(l => this.letterPoints[l] = 1);
@@ -168,7 +170,7 @@ let Game = function() {
           that.wordTiles = [];
           that.challenging = true;
           that.mayChallenge = false;
-          App.game.challenge();
+          App.game.challenge(false);
         }
       })
 
@@ -196,14 +198,17 @@ let Game = function() {
     buttons.appendChild(shuf);
   }
 
-  this.challenge = function() {
+  this.challenge = function(last) {
+    this.aboutToFinish = last == "true";
     this.challenged = true;
     let wordsAsString = this.prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
     App.game.validate_words(wordsAsString + " " + this.word);
   }
 
   this.processValidWords = function() {
-    if (this.challenged) {
+    if (this.aboutToFinish) {
+      this.theEnd();
+    } else if (this.challenged) {
       App.game.switch_turn(this.gameId, 0);
     } else if (this.word) {
 
@@ -217,8 +222,8 @@ let Game = function() {
 
       this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
 
-      App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
       App.game.deliver_score(this.totalScore);
+      App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
     } else {
       App.game.printMessage("Tile placement is not valid!");
     }
@@ -226,6 +231,7 @@ let Game = function() {
 
   this.processInvalidWords = function(word) {
     if (this.challenged) {
+      this.aboutToFinish = false;
       this.challenged = false;
       this.totalScore -= this.prevTurnScore;
 
@@ -243,17 +249,28 @@ let Game = function() {
   }
 
   this.replaceRackTiles = function() {
-    for (let i = 0; i < this.drawnLetters.length; i++) {
-      for (let j = 0; j < this.rackTiles.length; j++) {
-        if (this.drawnLetters[i] === this.rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
-          this.rackTiles[j].innerHTML = this.prevWordTiles[i].innerHTML;
-          this.prevWordTiles[i].innerHTML = "";
-          this.determineTileBackground(this.rackTiles[j]);
-          this.determineTileBackground(this.prevWordTiles[i]);
+    if (this.rackTiles.every(tile => !tile.innerHTML)) {
+      for (let i = 0; i < this.prevWordTiles.length; i++) {
+        this.rackTiles[i].innerHTML = this.prevWordTiles[i].innerHTML;
+        this.prevWordTiles[i].innerHTML = "";
+        this.determineTileBackground(this.rackTiles[i]);
+        this.determineTileBackground(this.prevWordTiles[i]);
 
-          App.game.remove_tile(this.prevWordTiles[i].id);
+        App.game.remove_tile(this.prevWordTiles[i].id);
+      }
+    } else {
+      for (let i = 0; i < this.drawnLetters.length; i++) {
+        for (let j = 0; j < this.rackTiles.length; j++) {
+          if (this.drawnLetters[i] === this.rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
+            this.rackTiles[j].innerHTML = this.prevWordTiles[i].innerHTML;
+            this.prevWordTiles[i].innerHTML = "";
+            this.determineTileBackground(this.rackTiles[j]);
+            this.determineTileBackground(this.prevWordTiles[i]);
 
-          break;
+            App.game.remove_tile(this.prevWordTiles[i].id);
+
+            break;
+          }
         }
       }
     }
@@ -956,26 +973,35 @@ let Game = function() {
     this.determineTileBackground(tile);
   }
 
-  this.switchTurn = function(letters, letRemaining) {
-    if (letters) {
-      this.populateRack(letters.split(""));
-    }
-
-    this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
-
-    this.mayChallenge = true;
+  this.switchTurn = function(letters, letRemaining, gameOver) {
     this.myTurn = !this.myTurn;
 
-    if (this.challenged) {
-      this.challenged = false;
-      App.game.printMessage("A challenge against you failed! Your turn...");
-    } else if (this.myTurn) {
-      App.game.printMessage("Your turn...");
-    } else if (this.challenging) {
-      this.challenging = false;
-      App.game.printMessage("Challenge failed! Opponent's turn...");
+    if (this.myTurn) {
+      this.drawnLetters = [];
+    }
+
+    if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
+      App.game.finalize_game();
     } else {
-      App.game.printMessage("Opponent's turn...");
+      if (letters) {
+        this.populateRack(letters.split(""));
+      }
+
+      this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
+
+      this.mayChallenge = true;
+
+      if (this.challenged) {
+        this.challenged = false;
+        App.game.printMessage("A challenge against you failed! Your turn...");
+      } else if (this.myTurn) {
+        App.game.printMessage("Your turn...");
+      } else if (this.challenging) {
+        this.challenging = false;
+        App.game.printMessage("Challenge failed! Opponent's turn...");
+      } else {
+        App.game.printMessage("Opponent's turn...");
+      }
     }
   }
 
@@ -984,10 +1010,51 @@ let Game = function() {
       this.challenging = false;
       App.game.printMessage("Challenge successful! Your turn...");
     }
+
     pElems = this.scoreBoard.children;
 
     pElems[0].textContent = 'Own Score: ' + this.totalScore;
     pElems[1].textContent = 'Opponent Score: ' + score;
+    this.opponentScore = score;
+  }
+
+  this.finishGame = function() {
+    if (this.challengable) {
+      if (this.myTurn) {
+        if (confirm("There are no letters left in the bag. Would you like to challenge the last word?")) {
+          App.game.challenge(true);
+        } else {
+          App.game.yield();
+          this.theEnd();
+        }
+      } else {
+        App.game.printMessage("Waiting to see if your oppenent will challenge your last word...");
+      }
+    } else {
+      this.theEnd();
+    }
+  }
+
+  this.theEnd = function() {
+    this.myTurn = false;
+
+    let tiles = document.getElementById("board").children;
+
+    for (let i = 0; i < tiles.length; i++) {
+      tiles[i].draggable = false;
+    }
+
+    for (let i = 0; i < this.rackTiles.length; i++) {
+      this.rackTiles[i].draggable = false;
+    }
+
+    if (this.totalScore > this.opponentScore) {
+      App.game.printMessage("Game is over! You won with " + this.totalScore + " points!");
+    } else if (this.totalScore < this.opponentScore) {
+      App.game.printMessage("Game is over! Your opponent won with " + this.opponentScore + " points!");
+    } else {
+      App.game.printMessage("Game is over! It is a tie with " + this.totalScore + " points!");
+    }
   }
 }
 

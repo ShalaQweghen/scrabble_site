@@ -28,8 +28,8 @@ class GameChannel < ApplicationCable::Channel
     Game.validate_words(uuid, data)
   end
 
-  def challenge
-    Game.challenge(uuid)
+  def challenge(data)
+    Game.challenge(uuid, data)
   end
 
   def return_back_letters(data)
@@ -38,5 +38,13 @@ class GameChannel < ApplicationCable::Channel
 
   def deliver_score(data)
     Game.deliver_score(uuid, data)
+  end
+
+  def yield
+    Game.yield(uuid)
+  end
+
+  def finalize_game
+    Game.finalize_game(uuid)
   end
 end
