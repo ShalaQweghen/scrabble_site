@@ -28,11 +28,13 @@ let Game = function() {
     this.challenging = false;
     this.mayChallenge = true;
     this.aboutToFinish = false;
+    this.passingEnd = false;
 
     this.turnScore = 0;
     this.totalScore = 0;
     this.prevTurnScore = 0;
     this.opponentScore = 0;
+    this.passes = 0;
 
     this.letterPoints = {};
     'LSUNRTOAIE'.split('').forEach(l => this.letterPoints[l] = 1);
@@ -209,7 +211,8 @@ let Game = function() {
     if (this.aboutToFinish) {
       this.theEnd();
     } else if (this.challenged) {
-      App.game.switch_turn(this.gameId, 0);
+      App.game.switch_turn(this.gameId, 0, this.passes);
+      this.passes = 0;
     } else if (this.word) {
 
       this.totalScore += this.calcPoints();
@@ -223,7 +226,8 @@ let Game = function() {
       this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
 
       App.game.deliver_score(this.totalScore);
-      App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
+      App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length, this.passes);
+      this.passes = 0;
     } else {
       App.game.printMessage("Tile placement is not valid!");
     }
@@ -936,15 +940,17 @@ let Game = function() {
   }
 
   this.passLetters = function(letters) {
+    this.passes += 1;
+
     letters = letters.split("")
 
-    for (let i = 0; i < this.passedLetters.length; i++) {
+    for (let i = 0; i < letters.length; i++) {
       let rackTile = this.rackTiles.find(tile => tile.textContent[0] === this.passedLetters[i]);
       rackTile.getElementsByTagName('span')[0].textContent = letters[i];
       rackTile.lastChild.textContent = this.letterPoints[letters[i]];
     }
 
-    App.game.switch_turn(this.gameId, 0);
+    App.game.switch_turn(this.gameId, 0, this.passes);
   }
 
   this.placeTile = function(id, letter) {
@@ -973,15 +979,17 @@ let Game = function() {
     this.determineTileBackground(tile);
   }
 
-  this.switchTurn = function(letters, letRemaining, gameOver) {
+  this.switchTurn = function(letters, letRemaining, passes, gameOver) {
     this.myTurn = !this.myTurn;
 
     if (this.myTurn) {
       this.drawnLetters = [];
     }
 
-    if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
-      App.game.finalize_game();
+    if (this.passes >= 3 && Number(passes) >= 3) {
+      App.game.finalize_game(true);
+    } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
+      App.game.finalize_game(false);
     } else {
       if (letters) {
         this.populateRack(letters.split(""));
@@ -1018,8 +1026,11 @@ let Game = function() {
     this.opponentScore = score;
   }
 
-  this.finishGame = function() {
-    if (this.challengable) {
+  this.finishGame = function(passEnding) {
+    if (passEnding) {
+      this.deductPoints();
+      this.theEnd();
+    } else if (this.challengable) {
       if (this.myTurn) {
         if (confirm("There are no letters left in the bag. Would you like to challenge the last word?")) {
           App.game.challenge(true);
@@ -1033,6 +1044,16 @@ let Game = function() {
     } else {
       this.theEnd();
     }
+  }
+
+  this.deductPoints = function() {
+    for (let i = 0; i < this.rackTiles.length; i++) {
+      if (this.rackTiles[i].innerHTML) {
+        this.totalScore -= this.letterPoints[this.rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
+      }
+    }
+
+    App.game.deliver_score(this.totalScore);
   }
 
   this.theEnd = function() {

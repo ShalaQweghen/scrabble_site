@@ -18,10 +18,10 @@ App.game = App.cable.subscriptions.create "GameChannel",
       when "switch_turn"
         params = data.msg.split(" ")
 
-        if params.length == 3
-          App.gamePlay.switchTurn(params[0], params[1], params[2])
+        if params.length == 4
+          App.gamePlay.switchTurn(params[0], params[1], params[2], params[3])
         else
-          App.gamePlay.switchTurn("", params[0], params[1])
+          App.gamePlay.switchTurn("", params[0], params[1], params[2])
       when "remove_tile"
         App.gamePlay.removeTile(data.msg)
       when "pass_letters"
@@ -37,7 +37,7 @@ App.game = App.cable.subscriptions.create "GameChannel",
       when "yield"
         App.gamePlay.theEnd()
       when "finish_game"
-        App.gamePlay.finishGame();
+        App.gamePlay.finishGame(data.msg);
         
   printMessage: (message) ->
     $("#messages").html("<p>#{message}</p>")
@@ -45,8 +45,8 @@ App.game = App.cable.subscriptions.create "GameChannel",
   make_move: (move) ->
     @perform 'make_move', data: move
 
-  switch_turn: (gameId, amount) ->
-    @perform 'switch_turn', data: { gameId, amount }
+  switch_turn: (gameId, amount, passes) ->
+    @perform 'switch_turn', data: { gameId, amount, passes }
 
   remove_tile: (id) ->
     @perform 'remove_tile', data: id
@@ -69,5 +69,5 @@ App.game = App.cable.subscriptions.create "GameChannel",
   yield: ->
     @perform 'yield'
 
-  finalize_game: ->
-    @perform 'finalize_game'
+  finalize_game: (passEnding) ->
+    @perform 'finalize_game', data: passEnding

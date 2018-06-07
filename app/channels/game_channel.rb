@@ -44,7 +44,7 @@ class GameChannel < ApplicationCable::Channel
     Game.yield(uuid)
   end
 
-  def finalize_game
-    Game.finalize_game(uuid)
+  def finalize_game(data)
+    Game.finalize_game(uuid, data)
   end
 end

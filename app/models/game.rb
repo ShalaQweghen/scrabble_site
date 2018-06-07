@@ -30,8 +30,8 @@ class Game < ApplicationRecord
 
     REDIS.set("game_bag_#{params["data"]["gameId"]}", bag)
 
-    ActionCable.server.broadcast "player_#{uuid}", { action: "switch_turn", msg: rack + " #{bag.length} #{rack.empty?}" }
-    ActionCable.server.broadcast "player_#{opponent}", { action: "switch_turn", msg: "#{bag.length} #{rack.empty?}" }
+    ActionCable.server.broadcast "player_#{uuid}", { action: "switch_turn", msg: rack + " #{bag.length} 0 #{rack.empty?}" }
+    ActionCable.server.broadcast "player_#{opponent}", { action: "switch_turn", msg: "#{bag.length} #{params["data"]["passes"]} #{rack.empty?}" }
   end
 
   def self.remove_tile(uuid, id)
@@ -88,11 +88,11 @@ class Game < ApplicationRecord
     ActionCable.server.broadcast "player_#{opponent}", { action: "yield", msg: nil }
   end
 
-  def self.finalize_game(uuid)
+  def self.finalize_game(uuid, ending_data)
     opponent = opponent_for(uuid)
 
-    ActionCable.server.broadcast "player_#{uuid}", { action: "finish_game", msg: nil }
-    ActionCable.server.broadcast "player_#{opponent}", { action: "finish_game", msg: nil }
+    ActionCable.server.broadcast "player_#{uuid}", { action: "finish_game", msg: ending_data["data"] }
+    ActionCable.server.broadcast "player_#{opponent}", { action: "finish_game", msg: ending_data["data"] }
   end
 
   def self.opponent_for(uuid)
