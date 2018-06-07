@@ -11,12 +11,17 @@ App.game = App.cable.subscriptions.create "GameChannel",
         [toGo, opponent, bag, game_id, challengable] = data.msg.split(' ')
         App.gamePlay = new Game()
         App.gamePlay.init(game_id, bag.split(''), opponent, toGo == "first", true)
-        @printMessage("Game has started! You play #{toGo}")
+        @printMessage("Game has started! You play #{toGo}.")
       when "make_move"
         [tile, letter] = data.msg.split(" ")
         App.gamePlay.placeTile(tile, letter)
       when "switch_turn"
-        App.gamePlay.switchTurn(data.msg)
+        params = data.msg.split(" ")
+
+        if params.length == 2
+          App.gamePlay.switchTurn(params[0], params[1])
+        else
+          App.gamePlay.switchTurn("", params[0])
       when "remove_tile"
         App.gamePlay.removeTile(data.msg)
       when "pass_letters"
@@ -27,9 +32,11 @@ App.game = App.cable.subscriptions.create "GameChannel",
         App.gamePlay.processInvalidWords(data.msg)
       when "challenge"
         App.gamePlay.challenge()
+      when "deliver_score"
+        App.gamePlay.updateScore(data.msg)
         
   printMessage: (message) ->
-    $("#messages").append("<p>#{message}</p>")
+    $("#messages").html("<p>#{message}</p>")
 
   make_move: (move) ->
     @perform 'make_move', data: move
@@ -51,3 +58,6 @@ App.game = App.cable.subscriptions.create "GameChannel",
 
   return_back_letters: (gameId, letters) ->
     @perform 'return_back_letters', data: { gameId, letters }
+
+  deliver_score: (score) ->
+    @perform 'deliver_score', data: score

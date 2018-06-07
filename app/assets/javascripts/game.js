@@ -1,5 +1,8 @@
 let Game = function() {
   this.init = function(gameId, letters, opponent, firstToGo, challengable) {
+    this.scoreBoard = document.getElementById("score");
+    this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
+
     this.gameId = gameId;
     this.opponent = opponent;
 
@@ -22,6 +25,8 @@ let Game = function() {
     this.passedLetters = [];
     this.challengable = challengable;
     this.challenged = false;
+    this.challenging = false;
+    this.mayChallenge = true;
 
     this.turnScore = 0;
     this.totalScore = 0;
@@ -146,7 +151,23 @@ let Game = function() {
       let challenge = document.createElement("button");
       challenge.textContent = "Challenge";
       challenge.addEventListener('click', function() {
-        if (that.myTurn) {
+        if (that.myTurn && !that.isFirstMove && that.mayChallenge) {
+          for (let i = 0; i < that.rackTiles.length; i++) {
+            if (!that.rackTiles[i].innerHTML) {
+              let tile = that.wordTiles.pop();
+
+              that.rackTiles[i].innerHTML = tile.innerHTML;
+              tile.innerHTML = "";
+              that.determineTileBackground(that.rackTiles[i]);
+              that.determineTileBackground(tile);
+
+              App.game.remove_tile(tile.id);
+            }
+          }
+
+          that.wordTiles = [];
+          that.challenging = true;
+          that.mayChallenge = false;
           App.game.challenge();
         }
       })
@@ -183,7 +204,6 @@ let Game = function() {
 
   this.processValidWords = function() {
     if (this.challenged) {
-      this.challenged = false;
       App.game.switch_turn(this.gameId, 0);
     } else if (this.word) {
 
@@ -195,7 +215,10 @@ let Game = function() {
         this.isFirstMove = false;
       }
 
+      this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
+
       App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length);
+      App.game.deliver_score(this.totalScore);
     } else {
       App.game.printMessage("Tile placement is not valid!");
     }
@@ -209,11 +232,14 @@ let Game = function() {
       this.activateWordTiles();
       this.replaceRackTiles();
 
-      App.game.printMessage("You have been challenged!");
-    }
+      this.scoreBoard.firstChild.textContent = "Own Score :" + this.totalScore;
 
+      App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
+      App.game.deliver_score(this.totalScore);
+    } else {
+      App.game.printMessage("'" + word + "' is not a valid word!");
+    }
     this.words = [];
-    App.game.printMessage("'" + word + "' is not a valid word!");
   }
 
   this.replaceRackTiles = function() {
@@ -241,10 +267,13 @@ let Game = function() {
     for (let i = 0; i < this.rackTiles.length; i++) {
       if (!this.rackTiles[i].innerHTML) {
         let letter = letters.pop()
-        this.rackTiles[i].innerHTML = '<span></span><sub></sub>';
-        this.rackTiles[i].getElementsByTagName('span')[0].textContent = letter;
-        this.rackTiles[i].lastChild.textContent = this.letterPoints[letter];
-        this.determineTileBackground(this.rackTiles[i]);
+        
+        if (letter) {
+          this.rackTiles[i].innerHTML = '<span></span><sub></sub>';
+          this.rackTiles[i].getElementsByTagName('span')[0].textContent = letter;
+          this.rackTiles[i].lastChild.textContent = this.letterPoints[letter];
+          this.determineTileBackground(this.rackTiles[i]);
+        }
       }
     }
   }
@@ -558,7 +587,7 @@ let Game = function() {
         }
       }
     }
-    
+
     return onBoard;
   }
 
@@ -612,7 +641,7 @@ let Game = function() {
       }
     }
 
-    return this.wordTiles.some(tile => (that.isFirstMove && tile.id === 'h8') || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && that.hasNoGaps()));
+    return this.wordTiles.some(tile => tile.id === 'h8' || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && that.hasNoGaps()));
   }
 
   this.produceWord = function() {
@@ -637,7 +666,7 @@ let Game = function() {
   }
 
   this.isValidPlacement = function() {
-    return ((this.isFirstMove && this.wordTiles.length > 1) || this.isContinuation()) && ((this.isValidToRight() && !this.isValidDownwards()) || (this.isValidDownwards() && !this.isValidToRight()) || this.wordTiles.length === 1);
+    return ((this.wordTiles.some(tile => tile.id === 'h8') && this.wordTiles.length > 1) || this.isContinuation()) && ((this.isValidToRight() && !this.isValidDownwards()) || (this.isValidDownwards() && !this.isValidToRight()) || this.wordTiles.length === 1);
   }
 
   this.isValidToRight = function() {
@@ -898,7 +927,7 @@ let Game = function() {
       rackTile.lastChild.textContent = this.letterPoints[letters[i]];
     }
 
-    App.game.switch_turn(this.gameId, 0)
+    App.game.switch_turn(this.gameId, 0);
   }
 
   this.placeTile = function(id, letter) {
@@ -927,12 +956,38 @@ let Game = function() {
     this.determineTileBackground(tile);
   }
 
-  this.switchTurn = function(letters) {
+  this.switchTurn = function(letters, letRemaining) {
     if (letters) {
       this.populateRack(letters.split(""));
     }
 
+    this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
+
+    this.mayChallenge = true;
     this.myTurn = !this.myTurn;
+
+    if (this.challenged) {
+      this.challenged = false;
+      App.game.printMessage("A challenge against you failed! Your turn...");
+    } else if (this.myTurn) {
+      App.game.printMessage("Your turn...");
+    } else if (this.challenging) {
+      this.challenging = false;
+      App.game.printMessage("Challenge failed! Opponent's turn...");
+    } else {
+      App.game.printMessage("Opponent's turn...");
+    }
+  }
+
+  this.updateScore = function(score) {
+    if (this.challenging) {
+      this.challenging = false;
+      App.game.printMessage("Challenge successful! Your turn...");
+    }
+    pElems = this.scoreBoard.children;
+
+    pElems[0].textContent = 'Own Score: ' + this.totalScore;
+    pElems[1].textContent = 'Opponent Score: ' + score;
   }
 }
 

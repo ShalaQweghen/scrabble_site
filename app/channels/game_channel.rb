@@ -35,4 +35,8 @@ class GameChannel < ApplicationCable::Channel
   def return_back_letters(data)
     Game.return_back_letters(uuid, data)
   end
+
+  def deliver_score(data)
+    Game.deliver_score(uuid, data)
+  end
 end

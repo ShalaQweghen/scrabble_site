@@ -29,10 +29,45 @@ h1 {
   font-family: cursive;
 }
 
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(10, 10%);
+  grid-template-rows: repeat(10, auto);
+}
+
+.board-container {
+  min-width: 480px;
+  grid-column: 4;
+  grid-row: 1 / span 10;
+}
+
+.score-container {
+  grid-column: 8 / span 3;
+  grid-row: 3 / span 2;
+}
+
+.messages-container {
+  grid-column: 8 / span 3;
+  grid-row: 5 / span 2;
+}
+
 #board {
   margin: auto;
   width: 480px;
   font-size: 0;
+}
+
+#score {
+  padding: 20px;
+  font-weight: bold;
+}
+
+#messages {
+  text-align: center;
+  margin-right: 10px;
+  padding: 20px;
+  border: 2px solid #3366ff;
+  border-radius: 5px;
 }
 
 .tile, .rack-tile {
