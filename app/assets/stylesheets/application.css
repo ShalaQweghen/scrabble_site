@@ -100,16 +100,24 @@ sub {
   text-align: center;
 }
 
+form {
+  width: 480px;
+  margin: auto;
+}
+
 button {
   display: inline-block;
+  font-size: 15px;
   border: none;
   width: 100px;
   height: 30px;
   margin-top: 10px;
   margin-right: 5px;
   border-radius: 5px;
+  background: #999;
 }
 
-button:hover {
+button:hover, input:hover {
+  cursor: pointer;
   background-color: #666699;
 }

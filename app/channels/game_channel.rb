@@ -1,11 +1,16 @@
 class GameChannel < ApplicationCable::Channel
   def subscribed
     stream_from "player_#{uuid}"
-    Match.create(uuid)
+
+    if params[:joining]
+      Game.start(uuid, params[:gameid])
+    else
+      Game.init(uuid, params[:gameid])
+    end
   end
 
   def unsubscribed
-    Match.remove(uuid)
+    Game.remove_game(uuid)
   end
 
   def make_move(data)

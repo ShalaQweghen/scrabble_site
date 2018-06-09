@@ -1,5 +1,5 @@
 let Game = function() {
-  this.init = function(gameId, letters, opponent, firstToGo, challengable) {
+  this.init = function(gameId, letters, firstToGo, challengable, opponent=null) {
     this.scoreBoard = document.getElementById("score");
     this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
 
@@ -57,6 +57,10 @@ let Game = function() {
     this.populateRack(letters);
   }
 
+  this.setOpponent = function(opponent) {
+    this.opponent = opponent;
+  }
+
   this.prepareBoard = function() {
     let that = this;
     let board = document.getElementById('board');
@@ -75,7 +79,7 @@ let Game = function() {
             node = event.target.parentNode;
           }
 
-          if (node.innerHTML && node.draggable) {
+          if (node.innerHTML && node.draggable && that.opponent) {
             // prevent context menu to pop up
             event.preventDefault();
 
@@ -117,7 +121,7 @@ let Game = function() {
     let sub = document.createElement('button');
     sub.textContent = "Submit";
     sub.addEventListener('click', function(event) {
-      if (that.myTurn) {
+      if (that.myTurn && that.opponent) {
         that.cleanWordTiles();
 
         if (that.isValidPlacement()) {
@@ -140,7 +144,7 @@ let Game = function() {
     let pass = document.createElement('button');
     pass.textContent = "Pass";
     pass.addEventListener('click', function(event) {
-      if (that.myTurn) {
+      if (that.myTurn && that.opponent) {
         let letters = prompt("Enter letters to change: ").toUpperCase().replace(/[^A-Z]/g, '').split('');
         let lettersOnRack = that.rackTiles.map(tile => tile.textContent[0]);
         letters = letters.filter(letter => lettersOnRack.includes(letter));
@@ -155,7 +159,7 @@ let Game = function() {
       let challenge = document.createElement("button");
       challenge.textContent = "Challenge";
       challenge.addEventListener('click', function() {
-        if (that.myTurn && !that.isFirstMove && that.mayChallenge) {
+        if (that.myTurn && !that.isFirstMove && that.mayChallenge && that.opponent) {
           for (let i = 0; i < that.rackTiles.length; i++) {
             if (!that.rackTiles[i].innerHTML) {
               let tile = that.wordTiles.pop();
@@ -327,7 +331,7 @@ let Game = function() {
         event.dataTransfer.setData('text/html', event.target.innerHTML);
         that.dragged = event.target;
 
-        if (event.target.className != "rack-tile" && that.myTurn) {
+        if (event.target.className != "rack-tile" && that.myTurn  && that.opponent) {
           App.game.remove_tile(event.target.id);
         }
       }
@@ -345,7 +349,7 @@ let Game = function() {
         node = event.target.parentNode;
       }
 
-      if (node.draggable && (that.myTurn || node.className == "rack-tile")) {
+      if (node.draggable && (that.myTurn || node.className == "rack-tile") && that.opponent) {
         if (node.innerHTML !== '') {
           // both board tile and clicked tile are occupied
           // this is the click to place the letter with swapping
@@ -398,7 +402,7 @@ let Game = function() {
         node = event.target.parentNode;
       }
 
-      if (that.dragged && node.draggable && (that.myTurn || node.className == 'rack-tile')) {
+      if (that.dragged && node.draggable && (that.myTurn || node.className == 'rack-tile')  && that.opponent) {
         that.dragged.innerHTML = node.innerHTML;
         node.innerHTML = event.dataTransfer.getData('text/html');
 

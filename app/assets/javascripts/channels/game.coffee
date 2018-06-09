@@ -1,17 +1,26 @@
-App.game = App.cable.subscriptions.create "GameChannel",
+App.game = App.cable.subscriptions.create { channel: "GameChannel", gameid: window.location.href.split(/[=&]/)[1], joining: window.location.href.split(/[=&]/)[3] },
   connected: ->
-    @printMessage("Waiting for opponent...")
+    # Called when the subscription has been initiated by the server
 
   disconnected: ->
     # Called when the subscription has been terminated by the server
 
   received: (data) ->
     switch data.action
-      when "game_start"
-        [toGo, opponent, bag, game_id, challengable] = data.msg.split(' ')
+      when "game_init"
+        [rack, gameId, challengable] = data.msg.split(" ")
         App.gamePlay = new Game()
-        App.gamePlay.init(game_id, bag.split(''), opponent, toGo == "first", true)
-        @printMessage("Game has started! You play #{toGo}.")
+        App.gamePlay.init(gameId, rack.split(""), true, challengable == "true")
+        @printMessage("Waiting for opponent...")
+      when "game_start"
+        if App.gamePlay
+          App.gamePlay.setOpponent(data.msg)
+          @printMessage("Game has started! You play first.")
+        else
+          [opponent, rack, game_id, challengable] = data.msg.split(' ')
+          App.gamePlay = new Game()
+          App.gamePlay.init(game_id, rack.split(''), false, challengable == "true", opponent)
+          @printMessage("Game has started! You play second.")
       when "make_move"
         [tile, letter] = data.msg.split(" ")
         App.gamePlay.placeTile(tile, letter)

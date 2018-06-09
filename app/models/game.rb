@@ -1,19 +1,29 @@
 class Game < ApplicationRecord
-  def self.start(player1, player2)
+  def self.init(host, game_id)
+    game = Game.find(game_id)
+    game.update!(host: host)
+
     bag = Bag.create_bag
-    game_id = SecureRandom.uuid
-    first, second = [player1, player2]
 
-    REDIS.set("opponent_for:#{first}", second)
-    REDIS.set("opponent_for:#{second}", first)
-
-    rack1, bag = Bag.complete_rack(7, bag)
-    rack2, bag = Bag.complete_rack(7, bag)
+    rack, bag = Bag.complete_rack(7, bag)
 
     REDIS.set("game_bag_#{game_id}", bag)
 
-    ActionCable.server.broadcast "player_#{first}", { action: "game_start", msg: "first player_#{second} " + rack1 + " " + game_id }
-    ActionCable.server.broadcast "player_#{second}", { action: "game_start", msg: "second player_#{first} " + rack2 + " " + game_id }
+    ActionCable.server.broadcast "player_#{game.host}", { action: "game_init", msg: "#{rack} #{game.id} #{game.challengable}" }
+  end
+
+  def self.start(player, game_id)
+    game = Game.find(game_id).destroy
+
+    bag = REDIS.get("game_bag_#{game_id}")
+    rack, bag = Bag.complete_rack(7, bag)
+
+    REDIS.set("opponent_for:#{game.host}", player)
+    REDIS.set("opponent_for:#{player}", game.host)
+    REDIS.set("game_bag_#{game_id}", bag)
+
+    ActionCable.server.broadcast "player_#{game.host}", { action: "game_start", msg: "player_#{player}" }
+    ActionCable.server.broadcast "player_#{player}", { action: "game_start", msg: "player_#{game.host} #{rack} #{game_id} #{game.challengable}" }
   end
 
   def self.make_move(uuid, move)
@@ -97,5 +107,12 @@ class Game < ApplicationRecord
 
   def self.opponent_for(uuid)
     REDIS.get("opponent_for:#{uuid}")
+  end
+
+  def self.remove_game(uuid)
+    game = Game.find_by(host: uuid)
+    if game
+      game.destroy
+    end
   end
 end

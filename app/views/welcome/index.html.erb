@@ -1,14 +1,13 @@
-<div class="wrapper">
-  <div class="board-container">
-    <h1>SCRABBLE</h1>
-    <div id="board"></div>
-    <div id="rack"></div>
-    <div id="buttons"></div>
-  </div>
-  <div class="score-container">
-    <div id="score"></div>
-  </div>
-  <div class="messages-container">
-    <div id="messages"></div>
-  </div>
-</div>
+<h1>Welcome to Scrabble Site</h1>
+<%= form_tag("/new") do %>
+  <%= check_box_tag "challenge"%>
+  <%= label_tag "challenge" %>
+  <%= submit_tag "Create a New Game" %>
+<% end %>
+
+<% @games.each do |game| %>
+  <%= form_tag("/join") do %>
+    <%= hidden_field_tag "game_id", game.id %>
+    <%= submit_tag "Join" %>
+  <% end %>
+<% end %>
