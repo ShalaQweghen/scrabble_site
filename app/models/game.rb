@@ -1,4 +1,7 @@
 class Game < ApplicationRecord
+  belongs_to :host, class_name: "User"
+  belongs_to :participant, class_name: "User"
+  
   def self.init(host, game_id)
     game = Game.find(game_id)
     game.update!(host: host)
