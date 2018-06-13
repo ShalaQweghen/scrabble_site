@@ -1,4 +1,3 @@
-console.log(window.location.href)
 window.onload = () ->
   App.game = App.cable.subscriptions.create { channel: "GameChannel", gameid: document.getElementById("messages").dataset["gameid"] },
     connected: ->
@@ -29,7 +28,6 @@ window.onload = () ->
           [tile, letter, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
-            console.log(2)
             App.gamePlay.placeTile(tile, letter)
         when "switch_turn"
           [rack, remaining, passes, rackEmpty, playerId] = data.msg.split(" ")

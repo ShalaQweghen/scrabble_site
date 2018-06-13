@@ -822,7 +822,6 @@ let Game = function() {
 
       if (word) {
         this.words.push(word);
-        console.log(this.words);
       }
     }
 
@@ -851,8 +850,6 @@ let Game = function() {
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
     }
 
-    console.log(this.words);
-
     return this.isConsecutive(sortedIds) && sortedWord.join('');
   }
 
@@ -875,32 +872,36 @@ let Game = function() {
 
       if (word) {
         this.words.push(word);
-        console.log(this.words);
       }
     }
-
-    // necessary for calculating points
-    // for adding the final main word
-    this.words.push([]);
 
     // get the letter values for the word in the sorted order
     let sortedWord = [];
-    for (let i = 0; i < gatheredIds.length; i++) {
-      let node = document.getElementById(gatheredIds[i]);
-      
-      this.words[this.words.length - 1].push(node);
 
-      // set the wild tile if any
-      if (node.getElementsByTagName('span')[0].textContent === ' ') {
-        let toBeReplaced = this.askForWildTile();
-        node.getElementsByTagName('span')[0].textContent = toBeReplaced;
+    // if only one tile is placed, main word is a gathered word
+    if (gatheredIds.length > 1) {
+      // necessary for calculating points
+      // for adding the final main word
+      this.words.push([]);
 
-        App.game.make_move(this.gameId, node.id + " " + toBeReplaced + "*");
+      for (let i = 0; i < gatheredIds.length; i++) {
+        let node = document.getElementById(gatheredIds[i]);
+        
+        this.words[this.words.length - 1].push(node);
+
+        // set the wild tile if any
+        if (node.getElementsByTagName('span')[0].textContent === ' ') {
+          let toBeReplaced = this.askForWildTile();
+          node.getElementsByTagName('span')[0].textContent = toBeReplaced;
+
+          App.game.make_move(this.gameId, node.id + " " + toBeReplaced + "*");
+        }
+
+        sortedWord.push(node.getElementsByTagName('span')[0].textContent);
       }
-
-      sortedWord.push(node.getElementsByTagName('span')[0].textContent);
+    } else {
+      sortedWord = this.words[this.words.length - 1]
     }
-    console.log(this.words);
 
     return this.isConsecutive(gatheredIds) && sortedWord.join('');
   }
