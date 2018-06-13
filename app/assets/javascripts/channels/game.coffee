@@ -80,9 +80,8 @@ window.onload = () ->
               App.gamePlay.theEnd()
 
         when "yield"
-          if App.gamePlay.playerId == data.msg
-            App.gamePlay.theEnd()
-            
+          App.gamePlay.theEnd()
+
         when "finish_game"
           App.gamePlay.finishGame(data.msg);
           
@@ -118,3 +117,6 @@ window.onload = () ->
 
     finalize_game: (gameId, passEnding) ->
       @perform 'finalize_game', data: { gameId, passEnding }
+
+    register_scores: (gameId, score) ->
+      @perform 'register_scores', data: { gameId, score }

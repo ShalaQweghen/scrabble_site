@@ -90,19 +90,25 @@ class Game < ApplicationRecord
     ActionCable.server.broadcast "game-#{score_data["data"]["gameId"]}", { action: "deliver_score", msg: "#{score_data["data"]["score"]} #{opponent} #{score_data["data"]["theEnd"]}" }
   end
 
-  def self.yield(user, data)
-    opponent = opponent_for(user)
-
-    ActionCable.server.broadcast "game-#{data["data"]}", { action: "yield", msg: opponent }
+  def self.yield(data)
+    ActionCable.server.broadcast "game-#{data["data"]}", { action: "yield", msg: nil }
   end
 
-  def self.finalize_game(user, ending_data)
-    opponent = opponent_for(user)
-
+  def self.finalize_game(ending_data)
     ActionCable.server.broadcast "game-#{ending_data["data"]["gameId"]}", { action: "finish_game", msg: ending_data["data"]["passEnding"] }
   end
 
   def self.opponent_for(user)
     REDIS.get("opponent_for:#{user}")
+  end
+
+  def self.register_scores(user, data)
+    game = Game.find(data["data"]["gameId"])
+
+    if game.host.id == user
+      game.update!(host_score: data["data"]["score"])
+    else
+      game.update!(part_score: data["data"]["score"])
+    end
   end
 end

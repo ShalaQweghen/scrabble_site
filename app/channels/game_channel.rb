@@ -44,10 +44,14 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def yield(data)
-    Game.yield(current_user, data)
+    Game.yield(data)
   end
 
   def finalize_game(data)
-    Game.finalize_game(current_user, data)
+    Game.finalize_game(data)
+  end
+
+  def register_scores(data)
+    Game.register_scores(current_user, data)
   end
 end

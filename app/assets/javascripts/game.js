@@ -1121,6 +1121,8 @@ let Game = function() {
     } else {
       App.game.printMessage("Game is over! It is a tie with " + this.totalScore + " points!");
     }
+
+    App.game.register_scores(this.gameId, this.totalScore);
   }
 }
 
