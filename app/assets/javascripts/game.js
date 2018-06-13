@@ -1,8 +1,9 @@
 let Game = function() {
-  this.init = function(gameId, letters, firstToGo, challengable, opponent=null) {
+  this.init = function(playerId, gameId, letters, firstToGo, challengable, opponent=null) {
     this.scoreBoard = document.getElementById("score");
     this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
 
+    this.playerId = playerId;
     this.gameId = gameId;
     this.opponent = opponent;
 
@@ -131,7 +132,8 @@ let Game = function() {
             that.processValidWords();
           } else {
             wordsAsString = that.words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
-            App.game.validate_words(wordsAsString);
+            console.log(wordsAsString);
+            App.game.validate_words(that.gameId, wordsAsString);
           }
 
         } else {
@@ -169,14 +171,14 @@ let Game = function() {
               that.determineTileBackground(that.rackTiles[i]);
               that.determineTileBackground(tile);
 
-              App.game.remove_tile(tile.id);
+              App.game.remove_tile(that.gameId, tile.id);
             }
           }
 
           that.wordTiles = [];
           that.challenging = true;
           that.mayChallenge = false;
-          App.game.challenge(false);
+          App.game.challenge(that.gameId, false);
         }
       })
 
@@ -208,7 +210,7 @@ let Game = function() {
     this.aboutToFinish = last == "true";
     this.challenged = true;
     let wordsAsString = this.prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
-    App.game.validate_words(wordsAsString + " " + this.word);
+    App.game.validate_words(this.gameId, wordsAsString);
   }
 
   this.processValidWords = function() {
@@ -229,7 +231,7 @@ let Game = function() {
 
       this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
 
-      App.game.deliver_score(this.totalScore);
+      App.game.deliver_score(this.gameId, this.totalScore);
       App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length, this.passes);
       this.passes = 0;
     } else {
@@ -249,7 +251,7 @@ let Game = function() {
       this.scoreBoard.firstChild.textContent = "Own Score :" + this.totalScore;
 
       App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
-      App.game.deliver_score(this.totalScore);
+      App.game.deliver_score(this.gameId, this.totalScore);
     } else {
       App.game.printMessage("'" + word + "' is not a valid word!");
     }
@@ -264,7 +266,7 @@ let Game = function() {
         this.determineTileBackground(this.rackTiles[i]);
         this.determineTileBackground(this.prevWordTiles[i]);
 
-        App.game.remove_tile(this.prevWordTiles[i].id);
+        App.game.remove_tile(this.gameId, this.prevWordTiles[i].id);
       }
     } else {
       for (let i = 0; i < this.drawnLetters.length; i++) {
@@ -275,7 +277,7 @@ let Game = function() {
             this.determineTileBackground(this.rackTiles[j]);
             this.determineTileBackground(this.prevWordTiles[i]);
 
-            App.game.remove_tile(this.prevWordTiles[i].id);
+            App.game.remove_tile(this.gameId, this.prevWordTiles[i].id);
 
             break;
           }
@@ -332,7 +334,7 @@ let Game = function() {
         that.dragged = event.target;
 
         if (event.target.className != "rack-tile" && that.myTurn  && that.opponent) {
-          App.game.remove_tile(event.target.id);
+          App.game.remove_tile(that.gameId, event.target.id);
         }
       }
     });
@@ -359,8 +361,8 @@ let Game = function() {
             that.addToWord(node)
 
             if (node.className != "rack-tile" && that.myTurn) {
-              App.game.remove_tile(node.id);
-              App.game.make_move(node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
+              App.game.remove_tile(that.gameId, node.id);
+              App.game.make_move(that.gameId, node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
             }
           } 
           // this is the click to grab the letter
@@ -370,7 +372,7 @@ let Game = function() {
             that.determineTileBackground(node);
 
             if (node.className != "rack-tile" && that.myTurn) {
-              App.game.remove_tile(node.id);
+              App.game.remove_tile(that.gameId, node.id);
             }
           }
         } else {
@@ -382,7 +384,7 @@ let Game = function() {
             that.addToWord(node);
 
             if (node.className != "rack-tile" && that.myTurn) {
-              App.game.make_move(node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
+              App.game.make_move(that.gameId, node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
             }
           }
         }
@@ -410,7 +412,7 @@ let Game = function() {
         that.addToWord(node);
 
         if (node.className != 'rack-tile') {
-          App.game.make_move(node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
+          App.game.make_move(that.gameId, node.id + " " + node.getElementsByTagName("SPAN")[0].textContent);
         }
 
         event.preventDefault();
@@ -803,6 +805,7 @@ let Game = function() {
 
       if (word) {
         this.words.push(word);
+        console.log(this.words);
       }
     }
 
@@ -825,11 +828,13 @@ let Game = function() {
         let toBeReplaced = this.askForWildTile();
         node.getElementsByTagName('span')[0].textContent = toBeReplaced;
 
-        App.game.make_move(node.id + " " + toBeReplaced + "*");
+        App.game.make_move(this.gameId, node.id + " " + toBeReplaced + "*");
       }
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
     }
+
+    console.log(this.words);
 
     return this.isConsecutive(sortedIds) && sortedWord.join('');
   }
@@ -853,6 +858,7 @@ let Game = function() {
 
       if (word) {
         this.words.push(word);
+        console.log(this.words);
       }
     }
 
@@ -872,11 +878,12 @@ let Game = function() {
         let toBeReplaced = this.askForWildTile();
         node.getElementsByTagName('span')[0].textContent = toBeReplaced;
 
-        App.game.make_move(node.id + " " + toBeReplaced + "*");
+        App.game.make_move(this.gameId, node.id + " " + toBeReplaced + "*");
       }
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
     }
+    console.log(this.words);
 
     return this.isConsecutive(gatheredIds) && sortedWord.join('');
   }
@@ -991,9 +998,9 @@ let Game = function() {
     }
 
     if (this.passes >= 3 && Number(passes) >= 3) {
-      App.game.finalize_game(true);
+      App.game.finalize_game(this.gameId, true);
     } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
-      App.game.finalize_game(false);
+      App.game.finalize_game(this.gameId, false);
     } else {
       if (letters) {
         this.populateRack(letters.split(""));
@@ -1037,9 +1044,9 @@ let Game = function() {
     } else if (this.challengable) {
       if (this.myTurn) {
         if (confirm("There are no letters left in the bag. Would you like to challenge the last word?")) {
-          App.game.challenge(true);
+          App.game.challenge(this.gameId, true);
         } else {
-          App.game.yield();
+          App.game.yield(this.gameId);
           this.theEnd();
         }
       } else {
@@ -1057,7 +1064,7 @@ let Game = function() {
       }
     }
 
-    App.game.deliver_score(this.totalScore);
+    App.game.deliver_score(this.gameId, this.totalScore);
   }
 
   this.theEnd = function() {
