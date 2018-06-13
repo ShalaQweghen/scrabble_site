@@ -64,10 +64,13 @@ window.onload = () ->
           if App.gamePlay.playerId == playerId
             App.gamePlay.challenge(last)
         when "deliver_score"
-          [score, playerId] = data.msg.split(" ")
+          [score, playerId, theEnd] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.updateScore(score)
+
+            if theEnd == "true"
+              App.gamePlay.theEnd()
         when "yield"
           if App.gamePlay.playerId == data.msg
             App.gamePlay.theEnd()
@@ -98,8 +101,8 @@ window.onload = () ->
     return_back_letters: (gameId, letters) ->
       @perform 'return_back_letters', data: { gameId, letters }
 
-    deliver_score: (gameId, score) ->
-      @perform 'deliver_score', data: { gameId, score }
+    deliver_score: (gameId, score, theEnd) ->
+      @perform 'deliver_score', data: { gameId, score, theEnd }
 
     yield: (gameId) ->
       @perform 'yield', data: gameId

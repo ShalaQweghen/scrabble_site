@@ -87,7 +87,7 @@ class Game < ApplicationRecord
   def self.deliver_score(user, score_data)
     opponent = opponent_for(user)
 
-    ActionCable.server.broadcast "game-#{score_data["data"]["gameId"]}", { action: "deliver_score", msg: "#{score_data["data"]["score"]} #{opponent}" }
+    ActionCable.server.broadcast "game-#{score_data["data"]["gameId"]}", { action: "deliver_score", msg: "#{score_data["data"]["score"]} #{opponent} #{score_data["data"]["theEnd"]}" }
   end
 
   def self.yield(user, data)

@@ -231,7 +231,7 @@ let Game = function() {
 
       this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
 
-      App.game.deliver_score(this.gameId, this.totalScore);
+      App.game.deliver_score(this.gameId, this.totalScore, false);
       App.game.switch_turn(this.gameId, 7 - this.rackTiles.filter(node => node.innerHTML).length, this.passes);
       this.passes = 0;
     } else {
@@ -251,7 +251,7 @@ let Game = function() {
       this.scoreBoard.firstChild.textContent = "Own Score :" + this.totalScore;
 
       App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
-      App.game.deliver_score(this.gameId, this.totalScore);
+      App.game.deliver_score(this.gameId, this.totalScore, false);
     } else {
       App.game.printMessage("'" + word + "' is not a valid word!");
     }
@@ -1038,22 +1038,23 @@ let Game = function() {
   }
 
   this.finishGame = function(passEnding) {
+    let that = this;
+
     if (passEnding) {
       this.deductPoints();
-      this.theEnd();
     } else if (this.challengable) {
       if (this.myTurn) {
         if (confirm("There are no letters left in the bag. Would you like to challenge the last word?")) {
           App.game.challenge(this.gameId, true);
         } else {
           App.game.yield(this.gameId);
-          this.theEnd();
+          this.deductPoints();
         }
       } else {
         App.game.printMessage("Waiting to see if your oppenent will challenge your last word...");
       }
     } else {
-      this.theEnd();
+      this.deductPoints();
     }
   }
 
@@ -1064,7 +1065,7 @@ let Game = function() {
       }
     }
 
-    App.game.deliver_score(this.gameId, this.totalScore);
+    App.game.deliver_score(this.gameId, this.totalScore, true);
   }
 
   this.theEnd = function() {
