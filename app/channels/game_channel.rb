@@ -11,10 +11,6 @@ class GameChannel < ApplicationCable::Channel
     end
   end
 
-  def unsubscribed
-    Game.remove_game(current_user)
-  end
-
   def make_move(data)
     Game.make_move(current_user, data)
   end

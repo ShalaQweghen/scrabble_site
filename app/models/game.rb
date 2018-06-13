@@ -105,11 +105,4 @@ class Game < ApplicationRecord
   def self.opponent_for(user)
     REDIS.get("opponent_for:#{user}")
   end
-
-  def self.remove_game(user)
-    game = Game.find_by(host: user)
-    if game
-      game.destroy
-    end
-  end
 end

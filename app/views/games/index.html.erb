@@ -1,13 +1,15 @@
 <h1>Join A Game</h1>
 <% @games.each do |game| %>
-  <%= form_with(model: game) do |form| %>
-    <%= form.hidden_field :game_id, value: game.id %>
-    <% if game.challengable %>
-      <p>Challengable</p>
-    <% end %>
-    <p>Points Limit: <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
-    <p>Time Limit: <%= game.time_limit > 0 ? game.time_limit : "None" %></p>
+  <% if game.available %>
+    <%= form_with(model: game) do |form| %>
+      <%= form.hidden_field :game_id, value: game.id %>
+      <% if game.challengable %>
+        <p>Challengable</p>
+      <% end %>
+      <p>Points Limit: <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
+      <p>Time Limit: <%= game.time_limit > 0 ? game.time_limit : "None" %></p>
 
-    <%= form.submit "Join" %>
+      <%= form.submit "Join" %>
+    <% end %>
   <% end %>
 <% end %>

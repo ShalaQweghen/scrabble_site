@@ -26,12 +26,13 @@ class GamesController < ApplicationController
   def update
     game = Game.find(params[:game][:game_id])
     game.update!(participant: current_user)
+    game.toggle!(:available)
     
     redirect_to game_path(game)
   end
 
   private
     def game_params
-      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit)
+      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit, :available)
     end
 end
