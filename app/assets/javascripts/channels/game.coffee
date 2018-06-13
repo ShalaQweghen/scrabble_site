@@ -14,21 +14,24 @@ window.onload = () ->
           App.gamePlay = new Game()
           App.gamePlay.init(playerId, gameId, rack.split(""), true, challengable == "true")
           @printMessage("Waiting for opponent...")
-        when "game_start"
-          [opponent, rack, game_id, challengable, playerId] = data.msg.split(' ')
 
-          if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponent
-            App.gamePlay.setOpponent(opponent)
+        when "game_start"
+          [opponentId, rack, game_id, challengable, playerId] = data.msg.split(' ')
+
+          if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponentId
+            App.gamePlay.setOpponent(opponentId)
             @printMessage("Game has started! You play first.")
           else if !App.gamePlay
             App.gamePlay = new Game()
-            App.gamePlay.init(opponent, game_id, rack.split(''), false, challengable == "true", playerId)
+            App.gamePlay.init(opponentId, game_id, rack.split(''), false, challengable == "true", playerId)
             @printMessage("Game has started! You play second.")
+
         when "make_move"
           [tile, letter, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.placeTile(tile, letter)
+
         when "switch_turn"
           [rack, remaining, passes, rackEmpty, playerId] = data.msg.split(" ")
 
@@ -36,31 +39,37 @@ window.onload = () ->
             App.gamePlay.switchTurn(rack, remaining, 0, rackEmpty)
           else
             App.gamePlay.switchTurn("", remaining, passes, rackEmpty)
+
         when "remove_tile"
-          [id, playerId] = data.msg.split(" ")
+          [tileId, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
-            App.gamePlay.removeTile(id)
+            App.gamePlay.removeTile(tileId)
+
         when "pass_letters"
           [letters, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.passLetters(letters)
+
         when "process_valid_words"
           [word, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.processValidWords()
+
         when "process_invalid_words"
           [word, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.processInvalidWords(word)
+
         when "challenge"
           [last, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
             App.gamePlay.challenge(last)
+
         when "deliver_score"
           [score, playerId, theEnd] = data.msg.split(" ")
 
@@ -69,9 +78,11 @@ window.onload = () ->
 
             if theEnd == "true"
               App.gamePlay.theEnd()
+
         when "yield"
           if App.gamePlay.playerId == data.msg
             App.gamePlay.theEnd()
+            
         when "finish_game"
           App.gamePlay.finishGame(data.msg);
           
