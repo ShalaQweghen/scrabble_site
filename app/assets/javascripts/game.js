@@ -152,6 +152,22 @@ let Game = function() {
         letters = letters.filter(letter => lettersOnRack.includes(letter));
         that.passedLetters = letters;
 
+        // remove any placed tiles off the board
+        for (let i = 0; i < that.rackTiles.length; i++) {
+          if (!that.rackTiles[i].innerHTML) {
+            let tile = that.wordTiles.pop();
+
+            that.rackTiles[i].innerHTML = tile.innerHTML;
+            tile.innerHTML = "";
+            that.determineTileBackground(that.rackTiles[i]);
+            that.determineTileBackground(tile);
+
+            App.game.remove_tile(that.gameId, tile.id);
+          }
+        }
+
+        that.wordTiles = [];
+
         App.game.pass_letters(that.gameId, letters);
       }
     });
@@ -162,6 +178,7 @@ let Game = function() {
       challenge.textContent = "Challenge";
       challenge.addEventListener('click', function() {
         if (that.myTurn && !that.isFirstMove && that.mayChallenge && that.opponent) {
+          // remove any placed tiles off the board
           for (let i = 0; i < that.rackTiles.length; i++) {
             if (!that.rackTiles[i].innerHTML) {
               let tile = that.wordTiles.pop();
