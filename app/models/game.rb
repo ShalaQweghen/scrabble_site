@@ -9,7 +9,7 @@ class Game < ApplicationRecord
 
     REDIS.set("game_bag_#{game.id}", bag)
 
-    ActionCable.server.broadcast "game-#{game.id}", { action: "game_init", msg: "#{game.host.id} #{rack} #{game.id} #{game.challengable}" }
+    ActionCable.server.broadcast "game-#{game.id}", { action: "game_init", msg: "#{game.host.id} #{rack} #{game.id} #{game.challengable} #{game.time_limit} #{game.points_limit}" }
   end
 
   def self.start(game)
@@ -20,7 +20,7 @@ class Game < ApplicationRecord
     REDIS.set("opponent_for:#{game.participant.id}", game.host.id)
     REDIS.set("game_bag_#{game.id}", bag)
 
-    ActionCable.server.broadcast "game-#{game.id}", { action: "game_start", msg: "#{game.participant.id} #{rack} #{game.id} #{game.challengable} #{game.host.id}" }
+    ActionCable.server.broadcast "game-#{game.id}", { action: "game_start", msg: "#{game.participant.id} #{rack} #{game.id} #{game.challengable} #{game.time_limit} #{game.points_limit} #{game.host.id}" }
   end
 
   def self.make_move(user, move)

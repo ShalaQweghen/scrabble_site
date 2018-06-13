@@ -1,11 +1,11 @@
 let Game = function() {
-  this.init = function(playerId, gameId, letters, firstToGo, challengable, opponentId=null) {
-    this.scoreBoard = document.getElementById("score");
-    this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
-
+  this.init = function(playerId, gameId, letters, firstToGo, challengable, timeLimit, pointsLimit, opponentId=null) {
     this.playerId = playerId;
     this.gameId = gameId;
     this.opponentId = opponentId;
+
+    this.timeLimit = Number(timeLimit);
+    this.pointsLimit = Number(pointsLimit);
 
     this.tileClicked = '';
     this.draggedTile = null;
@@ -57,11 +57,23 @@ let Game = function() {
     this.prepareBoard();
     this.prepareRack();
     this.prepareButtons();
+    this.prepareInfoArea();
     this.populateRack(letters);
   }
 
   this.setOpponent = function(opponentId) {
     this.opponentId = opponentId;
+  }
+
+  this.prepareInfoArea = function() {
+    this.scoreBoard = document.getElementById("score");
+    this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
+
+    if (this.pointsLimit > 0) {
+      let pointsLimitBox = document.createElement("div");
+      pointsLimit.innerHTML = "<p>Points Limit is set to " + this.pointsLimit + ".</p>";
+      document.getElementById("messages-container").appendChild(pointsLimitBox);
+    }
   }
 
   this.prepareBoard = function() {
@@ -1024,35 +1036,43 @@ let Game = function() {
   }
 
   this.switchTurn = function(letters, letRemaining, passes, gameOver) {
-    this.myTurn = !this.myTurn;
-
-    if (this.myTurn) {
-      this.drawnTiles = [];
-    }
-
-    if (this.passes >= 3 && Number(passes) >= 3) {
-      App.game.finalize_game(this.gameId, true);
-    } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
+    if (this.opponentScore >= this.pointsLimit) {
+      App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
+      App.game.finalize_game(this.gameId, false);
+    } else if ( this.totalScore >= this.pointsLimit) {
+      App.game.printMessage("Points Limit has been reached! You have won the game by " + this.totalScore + " points!");
       App.game.finalize_game(this.gameId, false);
     } else {
-      if (letters) {
-        this.populateRack(letters.split(""));
+      this.myTurn = !this.myTurn;
+
+      if (this.myTurn) {
+        this.drawnTiles = [];
       }
 
-      this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
-
-      this.canChallenge = true;
-
-      if (this.isChallenged) {
-        this.isChallenged = false;
-        App.game.printMessage("A challenge against you failed! Your turn...");
-      } else if (this.myTurn) {
-        App.game.printMessage("Your turn...");
-      } else if (this.challenging) {
-        this.challenging = false;
-        App.game.printMessage("Challenge failed! Opponent's turn...");
+      if (this.passes >= 3 && Number(passes) >= 3) {
+        App.game.finalize_game(this.gameId, true);
+      } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
+        App.game.finalize_game(this.gameId, false);
       } else {
-        App.game.printMessage("Opponent's turn...");
+        if (letters) {
+          this.populateRack(letters.split(""));
+        }
+
+        this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
+
+        this.canChallenge = true;
+
+        if (this.isChallenged) {
+          this.isChallenged = false;
+          App.game.printMessage("A challenge against you failed! Your turn...");
+        } else if (this.myTurn) {
+          App.game.printMessage("Your turn...");
+        } else if (this.challenging) {
+          this.challenging = false;
+          App.game.printMessage("Challenge failed! Opponent's turn...");
+        } else {
+          App.game.printMessage("Opponent's turn...");
+        }
       }
     }
   }

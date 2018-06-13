@@ -9,21 +9,21 @@ window.onload = () ->
     received: (data) ->
       switch data.action
         when "game_init"
-          [playerId, rack, gameId, challengable] = data.msg.split(" ")
+          [playerId, rack, gameId, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
 
           App.gamePlay = new Game()
-          App.gamePlay.init(playerId, gameId, rack.split(""), true, challengable == "true")
+          App.gamePlay.init(playerId, gameId, rack.split(""), true, challengable == "true", timeLimit, pointsLimit)
           @printMessage("Waiting for opponent...")
 
         when "game_start"
-          [opponentId, rack, game_id, challengable, playerId] = data.msg.split(' ')
+          [opponentId, rack, game_id, challengable, timeLimit, pointsLimit, playerId] = data.msg.split(' ')
 
           if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponentId
             App.gamePlay.setOpponent(opponentId)
             @printMessage("Game has started! You play first.")
           else if !App.gamePlay
             App.gamePlay = new Game()
-            App.gamePlay.init(opponentId, game_id, rack.split(''), false, challengable == "true", playerId)
+            App.gamePlay.init(opponentId, game_id, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId)
             @printMessage("Game has started! You play second.")
 
         when "make_move"
