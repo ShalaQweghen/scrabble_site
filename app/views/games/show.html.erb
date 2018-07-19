@@ -13,3 +13,9 @@
     <div id="messages" data-gameid="<%= @game.id %>"></div>
   </div>
 </div>
+
+<script type="text/javascript">
+  if (window.location.href.split("?")[1]) {
+    window.location.href = window.location.href.split("?")[0]
+  }
+</script>

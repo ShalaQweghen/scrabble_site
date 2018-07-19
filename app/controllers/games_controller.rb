@@ -28,7 +28,7 @@ class GamesController < ApplicationController
     game.update!(participant: current_user)
     game.toggle!(:available)
     
-    redirect_to game_path(game)
+    redirect_to game_path(game, refresh: true)
   end
 
   private
