@@ -61,10 +61,18 @@ let Game = function() {
     this.prepareButtons();
     this.prepareInfoArea();
     this.populateRack(letters);
+
+    if (this.timeLimit && this.opponentId) {
+      this.startCountdown();
+    }
   }
 
   this.setOpponent = function(opponentId) {
     this.opponentId = opponentId;
+
+    if (this.timeLimit) {
+      this.startCountdown();
+    }
   }
 
   this.prepareInfoArea = function() {
@@ -1090,6 +1098,7 @@ let Game = function() {
   }
 
   this.finishGame = function(passEnding, pointsLimit, timeLimit) {
+    // This is to prevent duplicate execution
     if (!this.finalChallengeAlreadyDone) {
       if (passEnding) {
         this.deductPoints();
@@ -1139,7 +1148,7 @@ let Game = function() {
       this.rackTiles[i].draggable = false;
     }
 
-    if (this.pointsLimit) {
+    if (this.pointsLimit && this.pointsLimit <= this.totalScore || this.pointsLimit <= this.opponentScore) {
       if (this.opponentScore >= this.pointsLimit) {
         App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
       } else if ( this.totalScore >= this.pointsLimit) {
@@ -1154,6 +1163,27 @@ let Game = function() {
     }
 
     App.game.register_scores(this.gameId, this.totalScore);
+  }
+
+  this.startCountdown = function() {
+    let that = this;
+
+    let tickTock = setInterval(function() {
+      let minutes = Math.floor(that.timeLimit / 60);
+      let seconds = Math.floor(that.timeLimit % 60);
+
+      that.timeLimit -= 1;
+
+      document.getElementById("clock").innerHTML = minutes + "m " + seconds + "s ";
+
+      if (that.timeLimit < 0) {
+        document.getElementById("clock").innerHTML = "TIME'S UP";
+
+        App.game.finalize_game(that.gameId, false, false, true);
+
+        clearInterval(tickTock);
+      }
+    }, 1000); 
   }
 }
 

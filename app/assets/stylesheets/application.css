@@ -48,6 +48,12 @@ h1 {
   font-weight: bold;
 }
 
+#clock {
+  text-align: center;
+  font-weight: bold;
+  color: crimson;
+}
+
 #messages {
   text-align: center;
   margin-right: 10px;
