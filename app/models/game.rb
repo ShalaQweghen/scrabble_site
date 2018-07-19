@@ -13,6 +13,10 @@ class Game < ApplicationRecord
   end
 
   def self.start(game)
+    if game.available
+      game.toggle!(:available)
+    end
+
     bag = REDIS.get("game_bag_#{game.id}")
     rack, bag = Bag.complete_rack(7, bag)
 
@@ -30,7 +34,6 @@ class Game < ApplicationRecord
   end
 
   def self.switch_turn(user, params)
-    opponent = opponent_for(user)
     game_id = params['data']['gameId']
 
     bag = REDIS.get("game_bag_#{game_id}")
@@ -90,12 +93,8 @@ class Game < ApplicationRecord
     ActionCable.server.broadcast "game-#{score_data["data"]["gameId"]}", { action: "deliver_score", msg: "#{score_data["data"]["score"]} #{opponent} #{score_data["data"]["theEnd"]}" }
   end
 
-  def self.yield(data)
-    ActionCable.server.broadcast "game-#{data["data"]}", { action: "yield", msg: nil }
-  end
-
   def self.finalize_game(ending_data)
-    ActionCable.server.broadcast "game-#{ending_data["data"]["gameId"]}", { action: "finish_game", msg: ending_data["data"]["passEnding"] }
+    ActionCable.server.broadcast "game-#{ending_data["data"]["gameId"]}", { action: "finish_game", msg: "#{ending_data["data"]["passEnding"]} #{ending_data["data"]["pointsLimit"]} #{ending_data["data"]["timeLimit"]}" }
   end
 
   def self.opponent_for(user)

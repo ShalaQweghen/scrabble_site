@@ -31,8 +31,10 @@ let Game = function() {
     this.challenging = false;
     this.drawnTiles = [];
     this.prevTurnScore = 0;
+    this.deductedPoints = 0;
     this.prevWordTiles = [];
     this.prevWords = [];
+    this.finalChallengeAlreadyDone = false;
 
     this.aboutToEnd = false;
 
@@ -71,7 +73,7 @@ let Game = function() {
 
     if (this.pointsLimit > 0) {
       let pointsLimitBox = document.createElement("div");
-      pointsLimit.innerHTML = "<p>Points Limit is set to " + this.pointsLimit + ".</p>";
+      pointsLimitBox.innerHTML = "<p>Points Limit is set to " + this.pointsLimit + ".</p>";
       document.getElementById("messages-container").appendChild(pointsLimitBox);
     }
   }
@@ -242,7 +244,7 @@ let Game = function() {
   }
 
   this.challenge = function(last) {
-    this.aboutToEnd = last == "true";
+    this.aboutToEnd = last;
     this.isChallenged = true;
 
     let wordsAsString = this.prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
@@ -253,7 +255,7 @@ let Game = function() {
   this.processValidWords = function() {
     if (this.aboutToEnd) {
       // it was the last word to be challenged
-      this.theEnd();
+      App.game.deliver_score(this.gameId, this.totalScore, true);
     } else if (this.isChallenged) {
       // the word was challenged and proved to be valid. Turn passes. No letters to be drawn
       App.game.switch_turn(this.gameId, 0, this.passes);
@@ -1036,23 +1038,20 @@ let Game = function() {
   }
 
   this.switchTurn = function(letters, letRemaining, passes, gameOver) {
-    if (this.opponentScore >= this.pointsLimit) {
-      App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
-      App.game.finalize_game(this.gameId, false);
-    } else if ( this.totalScore >= this.pointsLimit) {
-      App.game.printMessage("Points Limit has been reached! You have won the game by " + this.totalScore + " points!");
-      App.game.finalize_game(this.gameId, false);
-    } else {
-      this.myTurn = !this.myTurn;
+    this.myTurn = !this.myTurn;
+    this.finalChallengeAlreadyDone = false;
 
+    if (this.pointsLimit && (this.opponentScore >= this.pointsLimit || this.totalScore >= this.pointsLimit)) {
+      App.game.finalize_game(this.gameId, false, true, false);
+    } else {
       if (this.myTurn) {
         this.drawnTiles = [];
       }
 
       if (this.passes >= 3 && Number(passes) >= 3) {
-        App.game.finalize_game(this.gameId, true);
+        App.game.finalize_game(this.gameId, true, false, false);
       } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
-        App.game.finalize_game(this.gameId, false);
+        App.game.finalize_game(this.gameId, false, false, false);
       } else {
         if (letters) {
           this.populateRack(letters.split(""));
@@ -1090,34 +1089,40 @@ let Game = function() {
     this.opponentScore = score;
   }
 
-  this.finishGame = function(passEnding) {
-    let that = this;
-
-    if (passEnding) {
-      this.deductPoints();
-    } else if (this.challengable) {
-      if (this.myTurn) {
-        if (confirm("There are no letters left in the bag. Would you like to challenge the last word?")) {
-          App.game.challenge(this.gameId, true);
+  this.finishGame = function(passEnding, pointsLimit, timeLimit) {
+    if (!this.finalChallengeAlreadyDone) {
+      if (passEnding) {
+        this.deductPoints();
+      } else if (this.challengable && !timeLimit) {
+        if (this.myTurn) {
+          if (confirm("The game is about to end. Would you like to challenge the last word?")) {
+            App.game.challenge(this.gameId, true);
+          } else {
+            this.deductPoints(pointsLimit);
+          }
         } else {
-          App.game.yield(this.gameId);
-          this.deductPoints();
+          App.game.printMessage("Waiting to see if your opponent will challenge your last word...");
         }
       } else {
-        App.game.printMessage("Waiting to see if your oppenent will challenge your last word...");
+        this.deductPoints();
       }
-    } else {
-      this.deductPoints();
+
+      this.finalChallengeAlreadyDone = true;
     }
   }
 
-  this.deductPoints = function() {
-    for (let i = 0; i < this.rackTiles.length; i++) {
-      if (this.rackTiles[i].innerHTML) {
-        this.totalScore -= this.letterPoints[this.rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
+  this.deductPoints = function(pointsLimit) {
+    if (!pointsLimit) {
+      for (let i = 0; i < this.rackTiles.length; i++) {
+        if (this.rackTiles[i].innerHTML) {
+          pointsToBeDeducted = this.letterPoints[this.rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
+          this.deductedPoints += pointsToBeDeducted;
+          this.totalScore -= pointsToBeDeducted;
+        }
       }
     }
 
+    App.game.printMessage('Own Score: ' + this.totalScore);
     App.game.deliver_score(this.gameId, this.totalScore, true);
   }
 
@@ -1134,12 +1139,18 @@ let Game = function() {
       this.rackTiles[i].draggable = false;
     }
 
-    if (this.totalScore > this.opponentScore) {
-      App.game.printMessage("Game is over! You won with " + this.totalScore + " points!");
+    if (this.pointsLimit) {
+      if (this.opponentScore >= this.pointsLimit) {
+        App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
+      } else if ( this.totalScore >= this.pointsLimit) {
+        App.game.printMessage("Points Limit has been reached! You have won the game by " + this.totalScore + " points!");
+      }
+    } else if (this.totalScore > this.opponentScore) {
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, you won with " + this.totalScore + " points!");
     } else if (this.totalScore < this.opponentScore) {
-      App.game.printMessage("Game is over! Your opponent won with " + this.opponentScore + " points!");
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, your opponent won with " + this.opponentScore + " points!");
     } else {
-      App.game.printMessage("Game is over! It is a tie with " + this.totalScore + " points!");
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, it is a tie with " + this.totalScore + " points!");
     }
 
     App.game.register_scores(this.gameId, this.totalScore);

@@ -64,11 +64,14 @@ window.onload = () ->
           if App.gamePlay.playerId == playerId
             App.gamePlay.processInvalidWords(word)
 
+          if App.gamePlay.playerId != playerId
+            @printMessage("Your turn...")
+
         when "challenge"
           [last, playerId] = data.msg.split(" ")
 
           if App.gamePlay.playerId == playerId
-            App.gamePlay.challenge(last)
+            App.gamePlay.challenge(last == "true")
 
         when "deliver_score"
           [score, playerId, theEnd] = data.msg.split(" ")
@@ -76,14 +79,13 @@ window.onload = () ->
           if App.gamePlay.playerId == playerId
             App.gamePlay.updateScore(score)
 
-            if theEnd == "true"
-              App.gamePlay.theEnd()
-
-        when "yield"
-          App.gamePlay.theEnd()
+          if theEnd == "true"
+            App.gamePlay.theEnd()
 
         when "finish_game"
-          App.gamePlay.finishGame(data.msg);
+          [passEnding, pointsLimit, timeLimit] = data.msg.split(" ")
+
+          App.gamePlay.finishGame(passEnding == "true", pointsLimit == "true", timeLimit == "true");
           
     printMessage: (message) ->
       $("#messages").html("<p>#{message}</p>")
@@ -112,11 +114,8 @@ window.onload = () ->
     deliver_score: (gameId, score, theEnd) ->
       @perform 'deliver_score', data: { gameId, score, theEnd }
 
-    yield: (gameId) ->
-      @perform 'yield', data: gameId
-
-    finalize_game: (gameId, passEnding) ->
-      @perform 'finalize_game', data: { gameId, passEnding }
+    finalize_game: (gameId, passEnding, pointsLimit, timeLimit) ->
+      @perform 'finalize_game', data: { gameId, passEnding, pointsLimit, timeLimit }
 
     register_scores: (gameId, score) ->
       @perform 'register_scores', data: { gameId, score }

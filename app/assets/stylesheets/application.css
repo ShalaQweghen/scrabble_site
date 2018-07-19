@@ -21,18 +21,18 @@ h1 {
   grid-template-rows: repeat(10, auto);
 }
 
-.board-container {
+#board-container {
   min-width: 480px;
   grid-column: 4;
   grid-row: 1 / span 10;
 }
 
-.score-container {
+#score-container {
   grid-column: 8 / span 3;
   grid-row: 3 / span 2;
 }
 
-.messages-container {
+#messages-container {
   grid-column: 8 / span 3;
   grid-row: 5 / span 2;
 }

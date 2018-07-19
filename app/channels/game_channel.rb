@@ -43,10 +43,6 @@ class GameChannel < ApplicationCable::Channel
     Game.deliver_score(current_user, data)
   end
 
-  def yield(data)
-    Game.yield(data)
-  end
-
   def finalize_game(data)
     Game.finalize_game(data)
   end
