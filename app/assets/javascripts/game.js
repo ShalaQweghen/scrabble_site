@@ -965,7 +965,9 @@ let Game = function() {
       return points;
     }
 
-    let points = 0;
+    // Additional 60 points if all the tiles in the rack are used
+    let points = this.rackTiles.some(tile => tile.innerHTML) ? 0 : 60;
+
     this.words.forEach(word => points += calcWordPoints(word));
 
     this.prevTurnScore = points;
