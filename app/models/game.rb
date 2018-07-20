@@ -104,10 +104,30 @@ class Game < ApplicationRecord
   def self.register_scores(user, data)
     game = Game.find(data["data"]["gameId"])
 
-    if game.host.id == user
-      game.update!(host_score: data["data"]["score"])
-    else
-      game.update!(part_score: data["data"]["score"])
+    if game.host_score.nil? || game.part_score.nil?
+      if game.host.id == user
+        game.update!(host_score: data["data"]["score"])
+        game.host.update!(score: game.host.score + data["data"]["score"])
+
+        if data["data"]["winner"]
+          game.host.increment!(:wins)
+        elsif data["data"]["winner"].nil?
+          game.host.increment!(:ties)
+        else
+          game.host.increment!(:losses)
+        end
+      else
+        game.update!(part_score: data["data"]["score"])
+        game.participant.update!(score: game.participant.score + data["data"]["score"])
+
+        if data["data"]["winner"]
+          game.participant.increment!(:wins)
+        elsif data["data"]["winner"].nil?
+          game.participant.increment!(:ties)
+        else
+          game.participant.increment!(:losses)
+        end
+      end
     end
   end
 end

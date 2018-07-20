@@ -1107,7 +1107,7 @@ let Game = function() {
     // This is to prevent duplicate execution
     if (!this.finalChallengeAlreadyDone) {
       if (passEnding) {
-        this.deductPoints();
+        this.deductPoints(pointsLimit);
       } else if (this.challengable && !timeLimit) {
         if (this.myTurn) {
           if (confirm("The game is about to end. Would you like to challenge the last word?")) {
@@ -1119,7 +1119,7 @@ let Game = function() {
           App.game.printMessage("Waiting to see if your opponent will challenge your last word...");
         }
       } else {
-        this.deductPoints();
+        this.deductPoints(pointsLimit);
       }
 
       this.finalChallengeAlreadyDone = true;
@@ -1154,21 +1154,27 @@ let Game = function() {
       this.rackTiles[i].draggable = false;
     }
 
+    let winner = null;
+
     if (this.pointsLimit && this.pointsLimit <= this.totalScore || this.pointsLimit <= this.opponentScore) {
       if (this.opponentScore >= this.pointsLimit) {
+        winner = false;
         App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
       } else if ( this.totalScore >= this.pointsLimit) {
+        winner = true;
         App.game.printMessage("Points Limit has been reached! You have won the game by " + this.totalScore + " points!");
       }
     } else if (this.totalScore > this.opponentScore) {
+      winner = true;
       App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, you won with " + this.totalScore + " points!");
     } else if (this.totalScore < this.opponentScore) {
+      winner = false;
       App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, your opponent won with " + this.opponentScore + " points!");
     } else {
       App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, it is a tie with " + this.totalScore + " points!");
     }
 
-    App.game.register_scores(this.gameId, this.totalScore);
+    App.game.register_scores(this.gameId, this.totalScore, winner);
   }
 
   this.startCountdown = function() {

@@ -117,5 +117,5 @@ window.onload = () ->
     finalize_game: (gameId, passEnding, pointsLimit, timeLimit) ->
       @perform 'finalize_game', data: { gameId, passEnding, pointsLimit, timeLimit }
 
-    register_scores: (gameId, score) ->
-      @perform 'register_scores', data: { gameId, score }
+    register_scores: (gameId, score, winner) ->
+      @perform 'register_scores', data: { gameId, score, winner }

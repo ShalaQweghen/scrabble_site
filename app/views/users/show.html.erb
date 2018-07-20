@@ -1,10 +1,9 @@
 <h1><%= @user.name %></h1>
 <div class="container">
-  <% won = @user.hosted_games.select { |game| game.host_score > game.part_score }.count + @user.participated_games.select { |game| game.part_score > game.host_score }.count %>
   <div class="center">
-    <span class="status">Games Won: <%=  won %></span>
-    <span class="status">Games Lost: <%= @user.hosted_games.count + @user.participated_games.count - won %></span>
-    <span class="status">Games Tied: <%= 0 %></span>
+    <span class="status">Games Won: <%= @user.wins %></span>
+    <span class="status">Games Lost: <%= @user.losses %></span>
+    <span class="status">Games Tied: <%= @user.ties %></span>
     <span class="status">Ranking: <%= 0 %></span>
     <span class="status"><b>Total Points: <%= @user.score %></b></span>
   </div>
