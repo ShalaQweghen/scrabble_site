@@ -1,15 +1,25 @@
 <h1>Join A Game</h1>
-<% @games.each do |game| %>
-  <% if game.available %>
-    <%= form_with(model: game) do |form| %>
-      <%= form.hidden_field :game_id, value: game.id %>
-      <% if game.challengable %>
-        <p>Challengable</p>
-      <% end %>
-      <p>Points Limit: <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
-      <p>Time Limit: <%= game.time_limit > 0 ? game.time_limit : "None" %></p>
+<div class="container">
+  <% if @games.select {|game| game.available }.empty? %>
+    <h3 class="center">NO GAMES CREATED YET</h3>
+    <div class="center mt-2"><%= link_to "Create a Game", new_game_path, class: "btn btn-info" %></div>
+  <% else %>
+    <% @games.each do |game| %>
+      <% if game.available %>
+        <%= form_with(model: game, html: { class: "join-form" }) do |form| %>
+          <%= form.hidden_field :game_id, value: game.id %>
+          <h5><b>by <i><%= game.host.name %></i></b></h5>
+          <% if game.challengable %>
+            <p><b>Challenge Mode:</b> On</p>
+          <% else %>
+            <p><b>Challenge Mode:</b> Off</p>
+          <% end %>
+          <p><b>Points Limit:</b> <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
+          <p><b>Time Limit:</b> <%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></p>
 
-      <%= form.submit "Join" %>
+          <%= form.submit "Join", class: "btn btn-info btn-block" %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
-<% end %>
+</div>

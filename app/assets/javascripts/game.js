@@ -149,6 +149,7 @@ let Game = function() {
 
     let submitButton = document.createElement('button');
     submitButton.textContent = "Submit";
+    submitButton.className = "game-button";
     submitButton.addEventListener('click', function(event) {
       if (that.myTurn && that.opponentId) {
         that.cleanWordTiles();
@@ -172,6 +173,7 @@ let Game = function() {
 
     let passButton = document.createElement('button');
     passButton.textContent = "Pass";
+    passButton.className = "game-button";
     passButton.addEventListener('click', function(event) {
       if (that.myTurn && that.opponentId) {
         let lettersToPass = prompt("Enter letters to change: ").toUpperCase().replace(/[^A-Z]/g, '').split('');
@@ -203,6 +205,7 @@ let Game = function() {
     if (this.challengable) {
       let challengeButton = document.createElement("button");
       challengeButton.textContent = "Challenge";
+      challengeButton.className = "game-button";
       challengeButton.addEventListener('click', function() {
         if (that.myTurn && !that.isFirstMove && that.canChallenge && that.opponentId) {
           // remove any placed tiles off the board
@@ -232,6 +235,7 @@ let Game = function() {
 
     let shuffleButton = document.createElement('button');
     shuffleButton.textContent = "Shuffle";
+    shuffleButton.className = "game-button";
     shuffleButton.addEventListener('click', function() {
       let tiles = [];
 

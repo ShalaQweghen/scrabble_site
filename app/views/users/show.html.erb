@@ -1,0 +1,115 @@
+<h1><%= @user.name %></h1>
+<div class="container">
+  <% won = @user.hosted_games.select { |game| game.host_score > game.part_score }.count + @user.participated_games.select { |game| game.part_score > game.host_score }.count %>
+  <div class="center">
+    <span class="status">Games Won: <%=  won %></span>
+    <span class="status">Games Lost: <%= @user.hosted_games.count + @user.participated_games.count - won %></span>
+    <span class="status">Games Tied: <%= 0 %></span>
+    <span class="status">Ranking: <%= 0 %></span>
+    <span class="status"><b>Total Points: <%= @user.score %></b></span>
+  </div>
+  <hr>
+  <div class="games center">
+    <div class="sort-options mb-3">
+      <div class="form-check form-check-inline">
+        <input type="checkbox" id="hosted" class="form-check-input" checked>
+        <label for="hosted" class="form-check-label">Games Hosted</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="checkbox" id="participated" class="form-check-input" checked>
+        <label for="participated" class="form-check-label">Games Participated</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="checkbox" id="won" class="form-check-input" checked>
+        <label for="won" class="form-check-label">Games Won</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="checkbox" id="lost" class="form-check-input" checked>
+        <label for="lost" class="form-check-label">Games Lost</label>
+      </div>
+    </div>
+    <% @user.hosted_games.each do |game| %>
+      <div class="played-game hosted <%= game.host_score > game.part_score ? "won" : "lost" %>">
+        <table class="table table-sm table-bordered">
+          <tr>
+            <th scope="row">Score</th>
+            <td><%= game.host_score %></td>
+          </tr>
+          <tr>
+            <th scope="row">Participant</th>
+            <td><%= link_to game.participant.name, user_path(game.participant_id) %></td>
+          </tr>
+          <tr>
+            <th scope="row">Participant Score</th>
+            <td><%= game.part_score %></td>
+          </tr>
+          <tr>
+            <th scope="row">Challenge Mode</th>
+            <td><%= game.challengable ? "ON" : "OFF" %></td>
+          </tr>
+          <tr>
+            <th scope="row">Time Limit</th>
+            <td><%= game.points_limit > 0 ? game.points_limit : "None" %></td>
+          </tr>
+          <tr>
+            <th scope="row">Points Limit</th>
+            <td><%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
+    <% @user.participated_games.each do |game| %>
+      <div class="played-game participated <%= game.part_score > game.host_score ? "won" : "lost" %>">
+        <table class="table table-sm table-bordered">
+          <tr>
+            <th scope="row">Score</th>
+            <td><%= game.part_score %></td>
+          </tr>
+          <tr>
+            <th scope="row">Host</th>
+            <td><%= link_to game.host.name, user_path(game.host_id) %></td>
+          </tr>
+          <tr>
+            <th scope="row">Host Score</th>
+            <td><%= game.host_score %></td>
+          </tr>
+          <tr>
+            <th scope="row">Challenge Mode</th>
+            <td><%= game.challengable ? "ON" : "OFF" %></td>
+          </tr>
+          <tr>
+            <th scope="row">Time Limit</th>
+            <td><%= game.points_limit > 0 ? game.points_limit : "None" %></td>
+          </tr>
+          <tr>
+            <th scope="row">Points Limit</th>
+            <td><%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
+  </div>
+
+  <% if current_user.id == @user.id %>
+    <%= link_to "Edit", edit_user_registration_path, class: "btn btn-warning" %>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  let hosted = document.getElementsByClassName("hosted");
+  let participated = document.getElementsByClassName("participated");
+  let won = document.getElementsByClassName("won");
+  let lost = document.getElementsByClassName("lost");
+
+  let hostedCB = document.getElementById("hosted");
+  addOptionListener(hostedCB, hosted);
+
+  let participatedCB = document.getElementById("participated");
+  addOptionListener(participatedCB, participated);
+
+  let wonCB = document.getElementById("won");
+  addOptionListener(wonCB, won);
+
+  let lostCB = document.getElementById("lost");
+  addOptionListener(lostCB, lost);
+</script>

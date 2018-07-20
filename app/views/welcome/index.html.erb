@@ -1,4 +1,6 @@
 <h1>Welcome to Scrabble Site</h1>
-<%= link_to "Create a Game", new_game_path %>
-<%= link_to "Join a Game", games_path %>
-<%= link_to "Out", destroy_user_session_path, method: :delete %>
+
+<div class="center mt-5">
+  <%= link_to "Create a Game", new_game_path, class: "btn btn-info" %>
+  <%= link_to "Join a Game", games_path, class: "btn btn-info" %>
+</div>

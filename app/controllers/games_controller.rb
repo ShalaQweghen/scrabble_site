@@ -31,6 +31,12 @@ class GamesController < ApplicationController
     redirect_to game_path(game, refresh: true)
   end
 
+  def destroy
+    @game = Game.find(params[:id]).destroy
+    
+    redirect_to root_path
+  end
+
   private
     def game_params
       params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit, :available)
