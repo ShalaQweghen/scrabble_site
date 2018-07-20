@@ -29,64 +29,10 @@
       </div>
     </div>
     <% @user.hosted_games.each do |game| %>
-      <div class="played-game hosted <%= game.host_score > game.part_score ? "won" : "lost" %>">
-        <table class="table table-sm table-bordered">
-          <tr>
-            <th scope="row">Score</th>
-            <td><%= game.host_score %></td>
-          </tr>
-          <tr>
-            <th scope="row">Participant</th>
-            <td><%= link_to game.participant.name, user_path(game.participant_id) %></td>
-          </tr>
-          <tr>
-            <th scope="row">Participant Score</th>
-            <td><%= game.part_score %></td>
-          </tr>
-          <tr>
-            <th scope="row">Challenge Mode</th>
-            <td><%= game.challengable ? "ON" : "OFF" %></td>
-          </tr>
-          <tr>
-            <th scope="row">Time Limit</th>
-            <td><%= game.points_limit > 0 ? game.points_limit : "None" %></td>
-          </tr>
-          <tr>
-            <th scope="row">Points Limit</th>
-            <td><%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></td>
-          </tr>
-        </table>
-      </div>
+      <%= render_game_info_table(game, @user.id) %>
     <% end %>
     <% @user.participated_games.each do |game| %>
-      <div class="played-game participated <%= game.part_score > game.host_score ? "won" : "lost" %>">
-        <table class="table table-sm table-bordered">
-          <tr>
-            <th scope="row">Score</th>
-            <td><%= game.part_score %></td>
-          </tr>
-          <tr>
-            <th scope="row">Host</th>
-            <td><%= link_to game.host.name, user_path(game.host_id) %></td>
-          </tr>
-          <tr>
-            <th scope="row">Host Score</th>
-            <td><%= game.host_score %></td>
-          </tr>
-          <tr>
-            <th scope="row">Challenge Mode</th>
-            <td><%= game.challengable ? "ON" : "OFF" %></td>
-          </tr>
-          <tr>
-            <th scope="row">Time Limit</th>
-            <td><%= game.points_limit > 0 ? game.points_limit : "None" %></td>
-          </tr>
-          <tr>
-            <th scope="row">Points Limit</th>
-            <td><%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></td>
-          </tr>
-        </table>
-      </div>
+      <%= render_game_info_table(game, @user.id) %>
     <% end %>
   </div>
 
