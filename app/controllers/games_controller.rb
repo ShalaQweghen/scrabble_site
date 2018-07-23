@@ -39,6 +39,6 @@ class GamesController < ApplicationController
 
   private
     def game_params
-      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit, :available)
+      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit)
     end
 end

@@ -4,7 +4,8 @@ window.onload = () ->
       # Called when the subscription has been initiated by the server
 
     disconnected: ->
-      # Called when the subscription has been terminated by the server
+      # Called when the subscription has been ended by the server
+      console.log("Holala")
 
     received: (data) ->
       switch data.action
@@ -86,6 +87,10 @@ window.onload = () ->
           [passEnding, pointsLimit, timeLimit] = data.msg.split(" ")
 
           App.gamePlay.finishGame(passEnding == "true", pointsLimit == "true", timeLimit == "true");
+
+        when "forfeit"
+          if App.gamePlay.playerId == data.msg
+            App.gamePlay.forfeit()
           
     printMessage: (message) ->
       $("#messages").html("<p>#{message}</p>")
@@ -119,3 +124,6 @@ window.onload = () ->
 
     register_scores: (gameId, score, winner) ->
       @perform 'register_scores', data: { gameId, score, winner }
+
+    forfeit: (gameId, score) ->
+      @perform 'forfeit', data: { gameId, score }

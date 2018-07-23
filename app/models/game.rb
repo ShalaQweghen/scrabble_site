@@ -130,4 +130,26 @@ class Game < ApplicationRecord
       end
     end
   end
+
+  def self.forfeit(user, data)
+    game = Game.find(data["data"]["gameId"])
+    opponent = opponent_for(user)
+
+    if game.host_score.nil? && game.part_score.nil?
+      game.toggle!(:forfeited)
+      game.update!(forfeited_by: user)
+    end
+
+    if game.host.id == user
+      game.update!(host_score: data["data"]["score"])
+      game.host.update!(score: game.host.score - 50)
+      game.host.increment!(:losses)
+    else
+      game.update!(part_score: data["data"]["score"])
+      game.participant.update!(score: game.participant.score - 50)
+      game.participant.increment!(:losses)
+    end
+
+     ActionCable.server.broadcast "game-#{data["data"]["gameId"]}", { action: "forfeit", msg: "#{opponent}" }
+  end
 end

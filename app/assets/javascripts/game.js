@@ -169,7 +169,7 @@ let Game = function() {
         }
       }
     });
-    buttons.appendChild(submitButton);
+    buttonsArea.appendChild(submitButton);
 
     let passButton = document.createElement('button');
     passButton.textContent = "Pass";
@@ -200,7 +200,7 @@ let Game = function() {
         App.game.pass_letters(that.gameId, letters);
       }
     });
-    buttons.appendChild(passButton);
+    buttonsArea.appendChild(passButton);
 
     if (this.challengable) {
       let challengeButton = document.createElement("button");
@@ -230,7 +230,7 @@ let Game = function() {
         }
       })
 
-      buttons.appendChild(challengeButton);
+      buttonsArea.appendChild(challengeButton);
     }
 
     let shuffleButton = document.createElement('button');
@@ -252,7 +252,19 @@ let Game = function() {
         that.determineTileBackground(that.rackTiles[i]);
       }
     });
-    buttons.appendChild(shuffleButton);
+    buttonsArea.appendChild(shuffleButton);
+
+    let forfeitButton = document.createElement('button');
+    forfeitButton.textContent = "Forfeit";
+    forfeitButton.className = "btn btn-danger btn-sm mt-3";
+    forfeitButton.addEventListener('click', function() {
+      if (confirm("Are you sure to forfeit the game?")) {
+        App.game.forfeit(that.gameId, that.totalScore);
+        that.deactivateBoardAndButtons();
+        App.game.printMessage("You have forfeited the game. 50 points has been deducted from your overall score.");
+      }
+    });
+    document.getElementById("messages-container").appendChild(forfeitButton);
   }
 
   this.challenge = function(last) {
@@ -1103,6 +1115,12 @@ let Game = function() {
     this.opponentScore = score;
   }
 
+  this.forfeit = function() {
+    App.game.printMessage("The game has been forfeited by the opponent. You are the winner.");
+    this.deactivateBoardAndButtons();
+    App.game.register_scores(this.gameId, this.totalScore, true);
+  }
+
   this.finishGame = function(passEnding, pointsLimit, timeLimit) {
     // This is to prevent duplicate execution
     if (!this.finalChallengeAlreadyDone) {
@@ -1141,9 +1159,7 @@ let Game = function() {
     App.game.deliver_score(this.gameId, this.totalScore, true);
   }
 
-  this.theEnd = function() {
-    this.myTurn = false;
-
+  this.deactivateBoardAndButtons = function() {
     let tiles = document.getElementById("board").children;
 
     for (let i = 0; i < tiles.length; i++) {
@@ -1153,6 +1169,12 @@ let Game = function() {
     for (let i = 0; i < this.rackTiles.length; i++) {
       this.rackTiles[i].draggable = false;
     }
+  }
+
+  this.theEnd = function() {
+    this.myTurn = false;
+
+    this.deactivateBoardAndButtons();
 
     let winner = null;
 

@@ -1,7 +1,6 @@
 <h1>Create a New Game</h1>
 <%= form_with(model: @game, local: true) do |form| %>
   <%= form.hidden_field :host_id, value: current_user.id %>
-  <%= form.hidden_field :available, value: true %>
 
   <div class="row mb-2">
     <div class="col">

@@ -25,7 +25,9 @@ ActiveRecord::Schema.define(version: 20180720190202) do
     t.datetime "updated_at", null: false
     t.bigint "host_id"
     t.bigint "participant_id"
-    t.boolean "available"
+    t.boolean "available", default: true
+    t.boolean "forfeited", default: false
+    t.bigint "forfeited_by"
     t.index ["host_id"], name: "index_games_on_host_id"
     t.index ["participant_id"], name: "index_games_on_participant_id"
   end

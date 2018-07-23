@@ -6,7 +6,7 @@
   <% else %>
     <% @games.each do |game| %>
       <% if game.available %>
-        <%= form_with(model: game, html: { class: "join-form" }) do |form| %>
+        <%= form_with(model: game, html: { class: "join-form mb-3 mr-2 center" }) do |form| %>
           <%= form.hidden_field :game_id, value: game.id %>
           <h5><b>by <i><%= game.host.name %></i></b></h5>
           <% if game.challengable %>

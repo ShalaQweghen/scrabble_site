@@ -11,6 +11,9 @@ class GameChannel < ApplicationCable::Channel
     end
   end
 
+  def unsubscribed
+  end
+
   def make_move(data)
     Game.make_move(current_user, data)
   end
@@ -49,5 +52,9 @@ class GameChannel < ApplicationCable::Channel
 
   def register_scores(data)
     Game.register_scores(current_user, data)
+  end
+
+  def forfeit(data)
+    Game.forfeit(current_user, data)
   end
 end
