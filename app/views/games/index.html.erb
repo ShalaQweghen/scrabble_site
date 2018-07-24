@@ -9,11 +9,13 @@
         <%= form_with(model: game, html: { class: "join-form mb-3 mr-2 center" }) do |form| %>
           <%= form.hidden_field :game_id, value: game.id %>
           <h5><b>by <i><%= game.host.name %></i></b></h5>
+
           <% if game.challengable %>
             <p><b>Challenge Mode:</b> On</p>
           <% else %>
             <p><b>Challenge Mode:</b> Off</p>
           <% end %>
+          
           <p><b>Points Limit:</b> <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
           <p><b>Time Limit:</b> <%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></p>
 

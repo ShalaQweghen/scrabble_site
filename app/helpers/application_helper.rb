@@ -1,13 +1,13 @@
 module ApplicationHelper
   def bootstrap_class_for(flash_type)
-    { success: "alert-success", error: "alert-danger", alert: "alert-warning", notice: "alert-info" }[flash_type] || flash_type.to_s
+    { success: "alert-success", error: "alert-danger", alert: "alert-warning", warning: "alert-warning", notice: "alert-info" }[flash_type] || flash_type.to_s
   end
 
   def render_flash_messages
     content = ""
 
     flash.each do |msg_type, message|
-      content += content_tag(:div, class: "alert #{bootstrap_class_for(msg_type.to_sym)} fade-in center") do 
+      content += content_tag(:div, class: "alert #{bootstrap_class_for(msg_type.to_sym)} fade-in center mb-3") do 
         (message + content_tag(:button, 'x', class: "close small-text", data: { dismiss: 'alert' })).html_safe
       end
     end

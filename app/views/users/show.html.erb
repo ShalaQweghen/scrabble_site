@@ -1,4 +1,4 @@
-<h1><%= @user.name %></h1>
+<h1><%= @user.name %> <%= link_to "Edit", edit_user_registration_path, class: "btn btn-warning btn-sm align-top" if current_user.id == @user.id %></h1>
 <div class="container">
   <div class="center">
     <span class="status">Games Won: <%= @user.wins %></span>
@@ -9,35 +9,35 @@
   </div>
   <hr>
   <div class="games center">
-    <div class="sort-options mb-3">
-      <div class="form-check form-check-inline">
-        <input type="checkbox" id="hosted" class="form-check-input" checked>
-        <label for="hosted" class="form-check-label">Games Hosted</label>
+    <% if @user.hosted_games.empty? && @user.participated_games.empty? %>
+      <h3>No games played yet</h3>
+    <% else %>
+      <div class="sort-options mb-3">
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="hosted" class="form-check-input" checked>
+          <label for="hosted" class="form-check-label">Games Hosted</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="participated" class="form-check-input" checked>
+          <label for="participated" class="form-check-label">Games Participated</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="won" class="form-check-input" checked>
+          <label for="won" class="form-check-label">Games Won</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="lost" class="form-check-input" checked>
+          <label for="lost" class="form-check-label">Games Lost</label>
+        </div>
       </div>
-      <div class="form-check form-check-inline">
-        <input type="checkbox" id="participated" class="form-check-input" checked>
-        <label for="participated" class="form-check-label">Games Participated</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input type="checkbox" id="won" class="form-check-input" checked>
-        <label for="won" class="form-check-label">Games Won</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input type="checkbox" id="lost" class="form-check-input" checked>
-        <label for="lost" class="form-check-label">Games Lost</label>
-      </div>
-    </div>
-    <% @user.hosted_games.each do |game| %>
-      <%= render_game_info_table(game, @user.id) %>
-    <% end %>
-    <% @user.participated_games.each do |game| %>
-      <%= render_game_info_table(game, @user.id) %>
+      <% @user.hosted_games.each do |game| %>
+        <%= render_game_info_table(game, @user.id) %>
+      <% end %>
+      <% @user.participated_games.each do |game| %>
+        <%= render_game_info_table(game, @user.id) %>
+      <% end %>
     <% end %>
   </div>
-
-  <% if current_user.id == @user.id %>
-    <%= link_to "Edit", edit_user_registration_path, class: "btn btn-warning" %>
-  <% end %>
 </div>
 
 <script type="text/javascript">

@@ -15,7 +15,7 @@
 </div>
 
 <script type="text/javascript">
-  if (window.location.href.split("?")[1]) {
+  if (window.location.href.match(/.*\?refresh=true$/)) {
     window.location.href = window.location.href.split("?")[0]
   }
 </script>

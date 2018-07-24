@@ -5,26 +5,25 @@ window.onload = () ->
 
     disconnected: ->
       # Called when the subscription has been ended by the server
-      console.log("Holala")
 
     received: (data) ->
       switch data.action
         when "game_init"
-          [playerId, rack, gameId, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
+          [playerId, rack, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
 
           App.gamePlay = new Game()
-          App.gamePlay.init(playerId, gameId, rack.split(""), true, challengable == "true", timeLimit, pointsLimit)
+          App.gamePlay.init(playerId, rack.split(""), true, challengable == "true", timeLimit, pointsLimit)
           @printMessage("Waiting for opponent...")
 
         when "game_start"
-          [opponentId, rack, game_id, challengable, timeLimit, pointsLimit, playerId] = data.msg.split(' ')
+          [opponentId, rack, challengable, timeLimit, pointsLimit, playerId] = data.msg.split(' ')
 
           if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponentId
             App.gamePlay.setOpponent(opponentId)
             @printMessage("Game has started! You play first.")
           else if !App.gamePlay
             App.gamePlay = new Game()
-            App.gamePlay.init(opponentId, game_id, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId)
+            App.gamePlay.init(opponentId, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId)
             @printMessage("Game has started! You play second.")
 
         when "make_move"
@@ -90,40 +89,40 @@ window.onload = () ->
 
         when "forfeit"
           if App.gamePlay.playerId == data.msg
-            App.gamePlay.forfeit()
+            App.gamePlay.cancelGame()
           
     printMessage: (message) ->
       $("#messages").html("<p>#{message}</p>")
 
-    make_move: (gameId, move) ->
-      @perform 'make_move', data: { gameId, move }
+    make_move: (move) ->
+      @perform 'make_move', data: move
 
-    switch_turn: (gameId, amount, passes) ->
-      @perform 'switch_turn', data: { gameId, amount, passes }
+    switch_turn: (amount, passes) ->
+      @perform 'switch_turn', data: { amount, passes }
 
-    remove_tile: (gameId, id) ->
-      @perform 'remove_tile', data: { gameId, id }
+    remove_tile: (id) ->
+      @perform 'remove_tile', data: id
 
-    pass_letters: (gameId, letters) ->
-      @perform 'pass_letters', data: { gameId, letters }
+    pass_letters: (letters) ->
+      @perform 'pass_letters', data: letters
 
-    validate_words: (gameId, word) ->
-      @perform 'validate_words', data: { gameId, word }
+    validate_words: (words) ->
+      @perform 'validate_words', data: words
 
-    challenge: (gameId, last) ->
-      @perform 'challenge', data: { gameId, last }
+    challenge: (lastMove) ->
+      @perform 'challenge', data: lastMove
 
-    return_back_letters: (gameId, letters) ->
-      @perform 'return_back_letters', data: { gameId, letters }
+    return_back_letters: (letters) ->
+      @perform 'return_back_letters', data: letters
 
-    deliver_score: (gameId, score, theEnd) ->
-      @perform 'deliver_score', data: { gameId, score, theEnd }
+    deliver_score: (score, theEnd) ->
+      @perform 'deliver_score', data: { score, theEnd }
 
-    finalize_game: (gameId, passEnding, pointsLimit, timeLimit) ->
-      @perform 'finalize_game', data: { gameId, passEnding, pointsLimit, timeLimit }
+    finalize_game: (passEnding, pointsLimit, timeLimit) ->
+      @perform 'finalize_game', data: { passEnding, pointsLimit, timeLimit }
 
-    register_scores: (gameId, score, winner) ->
-      @perform 'register_scores', data: { gameId, score, winner }
+    register_scores: (score, winner) ->
+      @perform 'register_scores', data: { score, winner }
 
-    forfeit: (gameId, score) ->
-      @perform 'forfeit', data: { gameId, score }
+    forfeit: (score) ->
+      @perform 'forfeit', data: score
