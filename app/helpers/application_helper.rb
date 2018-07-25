@@ -1,4 +1,20 @@
 module ApplicationHelper
+  def order_players
+    users = User.order(score: :desc)
+
+    content_tag(:ol) do
+      content = ""
+      
+      users.each do |user|
+        content += (content_tag(:li) do
+          (link_to user.name, user_path(user.id)) + " -> #{user.score} points"
+        end)
+      end
+
+      content.html_safe
+    end
+  end
+
   def bootstrap_class_for(flash_type)
     { success: "alert-success", error: "alert-danger", alert: "alert-warning", warning: "alert-warning", notice: "alert-info" }[flash_type] || flash_type.to_s
   end

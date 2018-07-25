@@ -11,6 +11,27 @@
        <!--  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
       </form>
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#leaderBoard">Leader Board</button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="leaderBoard" tabindex="-1" role="dialog" aria-labelledby="leaderBoard" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-body mx-auto">
+
+              <h1>LeaderBoard</h1>
+              
+              <%= order_players %>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <ul class="navbar-nav my-2 my-lg-0">
         <%= login_helper %>

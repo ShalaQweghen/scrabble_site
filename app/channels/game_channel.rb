@@ -18,6 +18,10 @@ class GameChannel < ApplicationCable::Channel
     if self.game.participant_id && self.game.part_score.nil? && self.game.host_score.nil?
       Game.forfeit(current_user, self.game, {"score" => 0})
     end
+
+    if self.game.available
+      self.game.toggle!(:available)
+    end
   end
 
   def make_move(data)
