@@ -41,16 +41,16 @@
 </div>
 
 <script type="text/javascript">
-  let hosted = document.getElementsByClassName("hosted");
-  let participated = document.getElementsByClassName("participated");
+  let hostedBy = document.getElementsByClassName("hosted");
+  let participatedBy = document.getElementsByClassName("participated");
   let won = document.getElementsByClassName("won");
   let lost = document.getElementsByClassName("lost");
 
   let hostedCB = document.getElementById("hosted");
-  addOptionListener(hostedCB, hosted);
+  addOptionListener(hostedCB, hostedBy);
 
   let participatedCB = document.getElementById("participated");
-  addOptionListener(participatedCB, participated);
+  addOptionListener(participatedCB, participatedBy);
 
   let wonCB = document.getElementById("won");
   addOptionListener(wonCB, won);

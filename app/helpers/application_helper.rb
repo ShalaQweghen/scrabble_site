@@ -1,19 +1,4 @@
 module ApplicationHelper
-  def get_ranking(user)
-    User.order(:name, score: :desc).index { |u| u.id == user.id } + 1
-  end
-
-  def render_online_players
-    online_users = User.where(online: true)
-      content = ""
-
-      online_users.each do |user|
-        content += content_tag(:span, (link_to user.name, user_path(user.id)), class: "d-block")
-      end
-
-      content.html_safe
-  end
-
   def render_leader_board
     users = User.order(:name, score: :desc)
 

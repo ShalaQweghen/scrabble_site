@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Users::SessionsController < Devise::SessionsController
-  before_action :toggle_online, only: [:destroy]
+  before_action :set_offline, only: [:destroy]
 
   # GET /resource/sign_in
   # def new
@@ -11,7 +11,7 @@ class Users::SessionsController < Devise::SessionsController
   # POST /resource/sign_in
   def create
     super do |resource|
-      current_user.toggle!(:online)
+      current_user.update!(online: true)
       
       cookies.signed[:user_id] = current_user.id
     end
@@ -29,7 +29,7 @@ class Users::SessionsController < Devise::SessionsController
   #   devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
   # end
 
-  def toggle_online
-    current_user.toggle!(:online)
+  def set_offline
+    current_user.update!(online: false)
   end
 end

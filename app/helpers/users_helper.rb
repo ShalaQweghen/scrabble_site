@@ -1,4 +1,8 @@
 module UsersHelper
+  def get_ranking(user)
+    User.order(:name, score: :desc).index { |u| u.id == user.id } + 1
+  end
+  
   def render_game_info_table(game, user_id)
     if game.host_id == user_id
       kind = "hosted"
