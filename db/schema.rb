@@ -33,8 +33,9 @@ ActiveRecord::Schema.define(version: 20180720190202) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.integer "score"
-    t.string "name"
+    t.integer "score", default: 0
+    t.string "name", null: false
+    t.boolean "online", default: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"

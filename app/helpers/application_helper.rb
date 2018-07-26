@@ -4,9 +4,15 @@ module ApplicationHelper
 
     content_tag(:ol) do
       content = ""
-      
+
       users.each do |user|
         content += (content_tag(:li) do
+          if user.online
+            content_tag(:span, nil, class: "online mr-2", title: "Online")
+          else
+            content_tag(:span, nil, class: "offline mr-2", title: "Offline")
+          end + 
+
           (link_to user.name, user_path(user.id)) + " -> #{user.score} points"
         end)
       end
