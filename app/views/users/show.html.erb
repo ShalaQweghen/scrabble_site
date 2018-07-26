@@ -4,7 +4,7 @@
     <span class="status">Games Won: <%= @user.wins %></span>
     <span class="status">Games Lost: <%= @user.losses %></span>
     <span class="status">Games Tied: <%= @user.ties %></span>
-    <span class="status">Ranking: <%= 0 %></span>
+    <span class="status">Ranking: <%= get_ranking(@user) %></span>
     <span class="status"><b>Total Points: <%= @user.score %></b></span>
   </div>
   <hr>
