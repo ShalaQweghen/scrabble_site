@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180720190202) do
+ActiveRecord::Schema.define(version: 20180727161917) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20180720190202) do
     t.boolean "available", default: true
     t.boolean "forfeited", default: false
     t.bigint "forfeited_by"
+    t.integer "invite"
     t.index ["host_id"], name: "index_games_on_host_id"
     t.index ["participant_id"], name: "index_games_on_participant_id"
   end

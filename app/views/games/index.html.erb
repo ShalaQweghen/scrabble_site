@@ -5,22 +5,12 @@
     <div class="center mt-2"><%= link_to "Create a Game", new_game_path, class: "btn btn-info" %></div>
   <% else %>
     <% @games.each do |game| %>
-      <% if game.available %>
-        <%= form_with(model: game, html: { class: "join-form mb-3 mr-2 center" }) do |form| %>
-          <%= form.hidden_field :game_id, value: game.id %>
-          <h5><b>by <i><%= game.host.name %></i></b></h5>
-
-          <% if game.challengable %>
-            <p><b>Challenge Mode:</b> On</p>
-          <% else %>
-            <p><b>Challenge Mode:</b> Off</p>
-          <% end %>
-          
-          <p><b>Points Limit:</b> <%= game.points_limit > 0 ? game.points_limit : "None" %></p>
-          <p><b>Time Limit:</b> <%= game.time_limit > 0 ? "#{game.time_limit / 60}m #{game.time_limit % 60}s" : "None" %></p>
-
-          <%= form.submit "Join", class: "btn btn-info btn-block" %>
-        <% end %>
+      <% if game.available && !game.invite %>
+        <%= render "join_form", game: game %>
+      <% elsif game.available && game.invite == current_user.id %>
+        <hr>
+        <h3 class="center mt-2">Invitations</h3>
+        <%= render "join_form", game: game %>
       <% end %>
     <% end %>
   <% end %>

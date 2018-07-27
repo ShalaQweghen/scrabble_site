@@ -7,6 +7,25 @@
     <span class="status">Ranking: <%= get_ranking(@user) %></span>
     <span class="status"><b>Total Points: <%= @user.score %></b></span>
   </div>
+  <% if @user.id != current_user.id %>
+    <div class="center mt-3">
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#invite">Invite to Game</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="invite" tabindex="-1" role="dialog" aria-labelledby="invite" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body mx-auto">
+
+            <%= render "games/create_form", game: nil, invited: @user.id %>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
   <hr>
   <div class="games center">
     <% if @user.hosted_games.empty? && @user.participated_games.empty? %>
