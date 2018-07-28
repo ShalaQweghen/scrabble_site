@@ -4,3 +4,9 @@
   <%= link_to "Create a Game", new_game_path, class: "btn btn-info" %>
   <%= link_to "Join a Game", games_path, class: "btn btn-info" %>
 </div>
+
+<script type="text/javascript">
+  if (window.location.href.match(/.*\?declined=\d$/)) {
+    window.location.href = window.location.href.split("?")[0]
+  }
+</script>

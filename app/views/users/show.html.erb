@@ -49,10 +49,10 @@
           <label for="lost" class="form-check-label">Games Lost</label>
         </div>
       </div>
-      <% @user.hosted_games.each do |game| %>
+      <% @user.hosted_games.where(available: false).each do |game| %>
         <%= render_game_info_table(game, @user.id) %>
       <% end %>
-      <% @user.participated_games.each do |game| %>
+      <% @user.participated_games.where(available: false).each do |game| %>
         <%= render_game_info_table(game, @user.id) %>
       <% end %>
     <% end %>

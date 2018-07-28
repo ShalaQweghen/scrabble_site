@@ -1,5 +1,14 @@
 <nav class="navbar navbar-expand-lg navbar-light px-5">
   <%= link_to "ScrabbleSite", root_path, class: "navbar-brand" %>
+
+  <% if request.parameters["controller"] == "games" && request.parameters["action"] == "show" %>
+    <form class="form-inline m-auto invisible">
+     <!--  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
+    </form>
+
+    <%= link_to "You're invited to a game!", "/games/#invitations", id: "invitation", target: "_blank", class: "btn btn-danger btn-sm #{" invisible" if !current_user || !current_user.invited?}" %>
+  <% end %>
   
   <% if request.parameters["controller"] != "games" || request.parameters["action"] != "show" %>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -7,10 +16,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-       <form class="form-inline m-auto invisible">
-       <!--  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
-      </form>
+      <%= link_to "You're invited to a game!", "/games/#invitations", id: "invitation", class: "btn btn-danger btn-sm form-inline m-auto #{" invisible" if !current_user || !current_user.invited?}" %>
 
       <% if current_user %>
         <!-- Button trigger modal -->

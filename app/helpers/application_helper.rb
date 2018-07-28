@@ -1,6 +1,6 @@
 module ApplicationHelper
   def render_leader_board
-    users = User.order(:name, score: :desc)
+    users = User.order(score: :desc, name: :asc)
 
     content_tag(:ol) do
       content = ""

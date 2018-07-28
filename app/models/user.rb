@@ -6,4 +6,8 @@ class User < ApplicationRecord
 
   has_many :hosted_games, class_name: "Game", foreign_key: "host_id"
   has_many :participated_games, class_name: "Game", foreign_key: "participant_id"
+
+  def invited?
+    !Game.where(invite: id, available: true).empty?
+  end
 end

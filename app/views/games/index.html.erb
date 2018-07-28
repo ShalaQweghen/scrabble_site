@@ -6,11 +6,22 @@
   <% else %>
     <% @games.each do |game| %>
       <% if game.available && !game.invite %>
-        <%= render "join_form", game: game %>
-      <% elsif game.available && game.invite == current_user.id %>
-        <hr>
-        <h3 class="center mt-2">Invitations</h3>
-        <%= render "join_form", game: game %>
+        <div class="join-form">
+          <%= render "join_form", game: game %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if current_user.invited? %>
+      <hr>
+      <h3 class="center mt-2" id="invitations">Invitations</h3>
+      <% @games.each do |game| %>
+        <% if game.available && game.invite == current_user.id %>
+          <div class="join-form">
+            <%= render "join_form", game: game %>
+            <%= link_to "Decline", game_path(game.id, declined: true), method: :delete, class: "btn btn-warning d-block" %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
