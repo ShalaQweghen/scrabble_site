@@ -1,8 +1,11 @@
-<h1>Welcome to Scrabble Site</h1>
-
-<div class="center mt-5">
-  <%= link_to "Create a Game", new_game_path, class: "btn btn-info" %>
-  <%= link_to "Join a Game", games_path, class: "btn btn-info" %>
+<div class="container">
+  <div class="jumbotron text-center b-inherit">
+    <h1 class="display-4">Scrabble in Action</h1>
+    <p class="lead">Play Scrabble real time with other players online</p>
+    <hr class="my-4">
+    <%= link_to "Create a Game", new_game_path, class: "btn btn-info btn-lg" %>
+    <%= link_to "Join a Game", games_path, class: "btn btn-info btn-lg" %>
+  </div>
 </div>
 
 <script type="text/javascript">

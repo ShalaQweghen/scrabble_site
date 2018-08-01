@@ -1,14 +1,34 @@
-function addOptionListener(checkBox, list) {
+function addOptionListener(checkBox, list, klass) {
   checkBox.addEventListener("change", function() {
     if (checkBox.checked) {
       for (let i = 0; i < list.length; i++) {
-        list[i].classList.remove("hidden");
-        list[i].classList.add("visible");
+        list[i].classList.remove("d-none");
       }
     } else {
+      // Don't hide the related classes if their checkbox is checked
+      let cbs = document.querySelectorAll("input[type='checkbox']");
+
       for (let i = 0; i < list.length; i++) {
-        list[i].classList.remove("visible");
-        list[i].classList.add("hidden");
+        // Turn classList into a regular array
+        let id = list[i].classList.toString().split(" ");
+        // Remove the general played-game class
+        id.shift();
+        // When checkBox id filtered, a valid checkbox id remains
+        id = id.filter(item => item != checkBox.id)[0];
+
+        let flag = true;
+
+        for (let j = 0; j < cbs.length; j++) {
+          if (cbs[j].checked) {
+            if (cbs[j].id == id) {
+              flag = false;
+            }
+          }
+        }
+
+        if (flag) {
+          list[i].classList.add("d-none");
+        }       
       }
     }
   });

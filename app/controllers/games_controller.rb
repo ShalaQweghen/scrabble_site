@@ -6,7 +6,12 @@ class GamesController < ApplicationController
   end
 
   def show
-    @game = Game.find(params[:id])
+    begin
+      @game = Game.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to root_path
+      return
+    end
 
     if !@game.available && @game.host_id == current_user.id
       redirect_to root_path

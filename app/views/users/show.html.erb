@@ -1,6 +1,6 @@
 <h1><%= @user.name %> <%= link_to "Edit", edit_user_registration_path, class: "btn btn-warning btn-sm align-top" if current_user.id == @user.id %></h1>
 <div class="container">
-  <div class="center">
+  <div class="text-center">
     <span class="status">Games Won: <%= @user.wins %></span>
     <span class="status">Games Lost: <%= @user.losses %></span>
     <span class="status">Games Tied: <%= @user.ties %></span>
@@ -8,7 +8,7 @@
     <span class="status"><b>Total Points: <%= @user.score %></b></span>
   </div>
   <% if @user.id != current_user.id %>
-    <div class="center mt-3">
+    <div class="text-center mt-3">
       <!-- Button trigger modal -->
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#invite">Invite to Game</button>
     </div>
@@ -27,7 +27,7 @@
     </div>
   <% end %>
   <hr>
-  <div class="games center">
+  <div class="games text-center">
     <% if @user.hosted_games.empty? && @user.participated_games.empty? %>
       <h3>No games played yet</h3>
     <% else %>
@@ -45,6 +45,10 @@
           <label for="won" class="form-check-label">Games Won</label>
         </div>
         <div class="form-check form-check-inline">
+          <input type="checkbox" id="tied" class="form-check-input" checked>
+          <label for="tied" class="form-check-label">Games Tied</label>
+        </div>
+        <div class="form-check form-check-inline">
           <input type="checkbox" id="lost" class="form-check-input" checked>
           <label for="lost" class="form-check-label">Games Lost</label>
         </div>
@@ -60,20 +64,27 @@
 </div>
 
 <script type="text/javascript">
-  let hostedBy = document.getElementsByClassName("hosted");
-  let participatedBy = document.getElementsByClassName("participated");
-  let won = document.getElementsByClassName("won");
-  let lost = document.getElementsByClassName("lost");
+  (function() {
+    let hostedBy = document.getElementsByClassName("hosted");
+    let participatedBy = document.getElementsByClassName("participated");
+    let won = document.getElementsByClassName("won");
+    let lost = document.getElementsByClassName("lost");
+    let tied = document.getElementsByClassName("tied");
 
-  let hostedCB = document.getElementById("hosted");
-  addOptionListener(hostedCB, hostedBy);
+    let hostedCB = document.getElementById("hosted");
+    addOptionListener(hostedCB, hostedBy, "hosted");
 
-  let participatedCB = document.getElementById("participated");
-  addOptionListener(participatedCB, participatedBy);
+    let participatedCB = document.getElementById("participated");
+    addOptionListener(participatedCB, participatedBy, "participated");
 
-  let wonCB = document.getElementById("won");
-  addOptionListener(wonCB, won);
+    let wonCB = document.getElementById("won");
+    addOptionListener(wonCB, won, "won");
 
-  let lostCB = document.getElementById("lost");
-  addOptionListener(lostCB, lost);
+    let lostCB = document.getElementById("lost");
+    addOptionListener(lostCB, lost, "lost");
+
+    let tiedCB = document.getElementById("tied");
+    addOptionListener(tiedCB, tied, "tied");
+    }
+  )();
 </script>

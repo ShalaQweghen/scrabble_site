@@ -1,0 +1,20 @@
+<!-- Button trigger Leader Board modal -->
+<button type="button" class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#leaderBoard">Leader Board</button>
+
+<!-- Leader Board Modal -->
+<div class="modal fade" id="leaderBoard" tabindex="-1" role="dialog" aria-labelledby="leaderBoard" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body mx-auto">
+
+        <h1>LeaderBoard</h1>
+
+        <%= render_leader_board %>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

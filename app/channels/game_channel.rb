@@ -1,72 +1,68 @@
 class GameChannel < ApplicationCable::Channel
-  attr_accessor :game, :game_id
-
   def subscribed
     stream_from "game-#{params['gameid']}"
 
-    self.game_id = params['gameid']
-    self.game = Game.find(self.game_id)
+    @game_id = params['gameid']
+    @game = Game.find(@game_id)
 
-    if self.game.participant
-      Game.start(self.game)
+    if @game.participant
+      Game.start(@game)
     else
-      Game.init(self.game)
+      Game.init(@game)
     end
   end
 
   def unsubscribed
-    if self.game.participant_id.nil?
-      self.game.delete
-    elsif self.game.participant_id && self.game.part_score.nil? && self.game.host_score.nil?
-      Game.forfeit(current_user, self.game, { "score" => 0 })
-    end
+    @game = @game.reload
 
-    if self.game.available
-      self.game.toggle!(:available)
+    if @game.participant_id.nil?
+      @game.delete
+    elsif @game.participant_id && @game.part_score.nil? && @game.host_score.nil?
+      Game.forfeit(current_user, @game, { "score" => 0 })
     end
   end
 
   def make_move(data)
-    Game.make_move(current_user, self.game_id, data)
+    Game.make_move(current_user, @game_id, data)
   end
 
   def switch_turn(data)
-    Game.switch_turn(current_user, self.game_id, data)
+    Game.switch_turn(current_user, @game_id, data)
   end
 
   def remove_tile(data)
-    Game.remove_tile(current_user, self.game_id, data)
+    Game.remove_tile(current_user, @game_id, data)
   end
 
   def pass_letters(data)
-    Game.pass_letters(current_user, self.game_id, data)
+    Game.pass_letters(current_user, @game_id, data)
   end
 
   def validate_words(data)
-    Game.validate_words(current_user, self.game_id, data)
+    Game.validate_words(current_user, @game_id, data)
   end
 
   def challenge(data)
-    Game.challenge(current_user, self.game_id, data)
+    Game.challenge(current_user, @game_id, data)
   end
 
   def return_back_letters(data)
-    Game.return_back_letters(current_user, self.game_id, data)
+    Game.return_back_letters(current_user, @game_id, data)
   end
 
   def deliver_score(data)
-    Game.deliver_score(current_user, self.game_id, data)
+    Game.deliver_score(current_user, @game_id, data)
   end
 
   def finalize_game(data)
-    Game.finalize_game(self.game_id, data)
+    Game.finalize_game(@game_id, data)
   end
 
   def register_scores(data)
-    Game.register_scores(current_user, self.game, data)
+    Game.register_scores(current_user, @game, data)
   end
 
   def forfeit(data)
-    Game.forfeit(current_user, self.game, data)
+    Game.forfeit(current_user, @game, data)
   end
 end

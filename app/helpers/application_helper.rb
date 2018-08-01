@@ -29,7 +29,7 @@ module ApplicationHelper
     content = ""
 
     flash.each do |msg_type, message|
-      content += content_tag(:div, class: "alert #{bootstrap_class_for(msg_type.to_sym)} fade-in center mb-3") do 
+      content += content_tag(:div, class: "alert #{bootstrap_class_for(msg_type.to_sym)} fade-in text-center mb-3") do 
         (message + content_tag(:button, 'x', class: "close small-text", data: { dismiss: 'alert' })).html_safe
       end
     end

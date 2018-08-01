@@ -126,20 +126,18 @@ class Game < ApplicationRecord
     end
   end
 
-  def self.forfeit(user, game, data)
+  def self.forfeit(user, game, score)
     opponent = opponent_for(user)
 
-    if game.host_score.nil? && game.part_score.nil?
-      game.toggle!(:forfeited)
-      game.update!(forfeited_by: user)
-    end
+    game.toggle!(:forfeited)
+    game.update!(forfeited_by: user)
 
     if game.host.id == user
-      game.update!(host_score: data["score"])
+      game.update!(host_score: score["data"])
       game.host.update!(score: game.host.score - 50)
       game.host.increment!(:losses)
     else
-      game.update!(part_score: data["score"])
+      game.update!(part_score: score["data"])
       game.participant.update!(score: game.participant.score - 50)
       game.participant.increment!(:losses)
     end

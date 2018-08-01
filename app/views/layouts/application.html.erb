@@ -14,9 +14,5 @@
     <%= render_flash_messages %>
     
     <%= yield %>
-
-    <% if current_user %>
-      <%= render "shared/online_users" %>
-    <% end %>
   </body>
 </html>

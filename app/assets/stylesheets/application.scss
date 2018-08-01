@@ -16,6 +16,18 @@ h1, h2 {
   font-family: cursive;
 }
 
+form {
+  width: 480px;
+  margin: auto;
+}
+
+/* Game Board (games#show) */
+
+sub {
+  color: #64403d;
+  font-size: 9px;
+}
+
 .wrapper {
   display: grid;
   grid-template-columns: repeat(10, 10%);
@@ -85,25 +97,6 @@ h1, h2 {
   margin-bottom: 20px;
 }
 
-sub {
-  color: #64403d;
-  font-size: 9px;
-}
-
-#buttons {
-  text-align: center;
-}
-
-form {
-  width: 480px;
-  margin: auto;
-}
-
-.join-form {
-  display: inline-block;
-  width: 200px;
-}
-
 .game-button {
   display: inline-block;
   font-size: 15px;
@@ -116,18 +109,16 @@ form {
   background: #999;
 }
 
-button:hover {
+.game-button:hover {
   cursor: pointer;
   background-color: #666699;
 }
 
-.center {
-  text-align: center;
-  margin: auto;
-}
+/* users#show */
 
-.small-text {
-  font-size: 10px;
+.status {
+  display: inline-block;
+  margin: 0 15px;
 }
 
 .played-game {
@@ -135,18 +126,7 @@ button:hover {
   display: inline-block;
 }
 
-.hidden {
-  display: none;
-}
-
-.visible {
-  display: inline-block;
-}
-
-.status {
-  display: inline-block;
-  margin: 0 15px;
-}
+/* Leader Board */
 
 .online, .offline {
   display: inline-block;
@@ -163,25 +143,93 @@ button:hover {
   background: red;
 }
 
-.online-users {
-  position: fixed;
-  padding-right: 30px;
+/* Online Users */
+
+#online-users-area {
   overflow-y: auto;
-  height: 75%;
-  top: 110px;
-  left: 20px;
+  max-height: 200px;
 }
 
-::-webkit-scrollbar {
-    width: 12px;
+/* Other */
+
+.join-form {
+  display: inline-block;
+  width: 200px;
 }
- 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-    border-radius: 10px;
+
+.small-text {
+  font-size: 10px;
 }
- 
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+
+.b-inherit {
+  background: inherit;
+}
+
+/* Word Animation */
+
+.tLetter {
+  background: #BE975B;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 1px solid gray;
+  transition-duration: .5s;
+  transition-property: transform;
+}
+
+.tLetter > sub {
+  font-size: 10px;
+  font-weight: normal;
+}
+
+.tLetter0 {
+  transform: rotate(8deg);
+}
+
+.tLetter1 {
+  transform: rotate(-12deg);
+}
+
+.tLetter2 {
+  transform: rotate(16deg);
+}
+
+.tLetter3 {
+  transform: rotate(-22deg);
+}
+
+.tLetter4 {
+  transform: rotate(26deg);
+}
+
+.tLetter5 {
+  transform: rotate(-30deg);
+}
+
+.tLetter6 {
+  transform: rotate(-34deg);
+}
+
+.tLetter7 {
+  transform: rotate(38deg);
+}
+
+.tLetter8 {
+  transform: rotate(-42deg);
+}
+
+.tLetter9 {
+  transform: rotate(46deg);
+}
+
+.undo {
+  transform: none;
+  margin-right: 1px;
+}
+
+.undo-link {
+  cursor: pointer;
 }

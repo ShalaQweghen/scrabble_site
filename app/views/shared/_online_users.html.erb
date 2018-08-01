@@ -1,37 +1,46 @@
-<div class="online-users">
-  <h6>Online Users</h6>
-  <div id="online-users-area"></div> 
+<div id="online-users" class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle btn-sm mr-2" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Online Users
+  </button>
+
+  <div id="online-users-area" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+  </div>
 </div>
 
 <script type="text/javascript">
   (function onlineUsersWorker() {
-    $.ajax({
-      type: "GET",
-      dataType: "json",
-      url: "/users",
-      success: function(data) {
-        $("#online-users-area").children().remove();
+    let menu = document.getElementById("dropdownMenuLink");
 
-        for (let i = 0; i < data.length; i++) {
-          let span = document.createElement("SPAN");
-          span.classList.add("d-block");
+    if (!document.getElementById("online-users").classList.contains("show") || !menu.onclick) {
 
-          let a = document.createElement("A");
-          a.setAttribute("href", "/users/" + data[i].id);
+      $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/users",
+        success: function(data) {
+          $("#online-users-area").children().remove();
 
-          if (document.getElementById("board")) {
-            a.setAttribute("target", "_blank");
+          for (let i = 0; i < data.length; i++) {
+
+            let a = document.createElement("A");
+            a.setAttribute("href", "/users/" + data[i].id);
+            a.classList.add("dropdown-item");
+
+            if (document.getElementById("board")) {
+              a.setAttribute("target", "_blank");
+            }
+
+            a.textContent = data[i].name;
+
+            $("#online-users-area").append(a);
           }
-
-          a.textContent = data[i].name;
-          span.appendChild(a);
-
-          $("#online-users-area").append(span);
+        },
+        complete: function() {
+          if (!menu.onclick) {
+            menu.onclick = onlineUsersWorker;
+          }
         }
-      },
-      complete: function() {
-        setTimeout(onlineUsersWorker, 240000);
-      }
-    })
+      })
+    }
   })();
 </script>

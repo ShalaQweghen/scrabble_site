@@ -2,14 +2,30 @@ module UsersHelper
   def get_ranking(user)
     User.order(:name, score: :desc).index { |u| u.id == user.id } + 1
   end
+
+  def set_outcome(game, user_id, p1_score, p2_score)
+    if game.forfeited
+      outcome =  game.forfeited_by == user_id ? "lost" : "won"
+    else
+      if p1_score > p2_score
+        outcome = "won"
+      elsif p1_score < p2_score
+        outcome = "lost"
+      else
+        outcome = "tied"
+      end
+    end
+
+    return outcome
+  end
   
   def render_game_info_table(game, user_id)
     if game.host_id == user_id
       kind = "hosted"
-      outcome = game.host_score > game.part_score ? "won" : "lost"
+      outcome = set_outcome(game, user_id, game.host_score, game.part_score)
     else
       kind = "participated"
-      outcome = game.part_score > game.host_score ? "won" : "lost"
+      outcome = set_outcome(game, user_id, game.part_score, game.host_score)
     end
 
     content_tag(:div, class: "played-game #{kind} #{outcome}") do
