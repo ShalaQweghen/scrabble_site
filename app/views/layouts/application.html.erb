@@ -9,10 +9,15 @@
   </head>
 
   <body>
-    <%= render "shared/nav" %>
+      <%= render "shared/nav" %>
 
-    <%= render_flash_messages %>
-    
-    <%= yield %>
+      <%= render_flash_messages %>
+      
+      <%= yield %>
+    <footer class="footer">
+      <div class="container">
+        <p>CopyLeft © 2018 | Contact: <a href="mailto:serafettinyilmaz@harran.edu.tr">Inst. Şerafettin Yılmaz</a></p>
+      </div>
+    </footer>
   </body>
 </html>

@@ -54,7 +54,7 @@ module UsersHelper
         end +
         content_tag(:tr) do
           content_tag(:th, "Points Limit", scope: "row") +
-          content_tag(:td, game.points_limit)
+          content_tag(:td, game.points_limit > 0 ? game.points_limit : "None")
         end
       end
     end

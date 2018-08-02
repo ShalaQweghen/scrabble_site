@@ -6,25 +6,25 @@ class Bag
     3.times { bag << 'G' }
     8.times { bag << 'O' }
 
-    # ['I', 'A'].each do |l|
-    #   9.times { bag << l }
-    # end
+    ['I', 'A'].each do |l|
+      9.times { bag << l }
+    end
 
-    # ['T', 'R', 'N'].each do |l|
-    #   6.times { bag << l }
-    # end
+    ['T', 'R', 'N'].each do |l|
+      6.times { bag << l }
+    end
 
-    # ['D', 'U', 'S', 'L'].each do |l|
-    #   4.times { bag << l }
-    # end
+    ['D', 'U', 'S', 'L'].each do |l|
+      4.times { bag << l }
+    end
 
-    # ['F', 'H', 'V', 'W', 'Y', 'B', 'C', 'M', 'P', ' '].each do |l|
-    #   2.times { bag << l }
-    # end
+    ['F', 'H', 'V', 'W', 'Y', 'B', 'C', 'M', 'P', ' '].each do |l|
+      2.times { bag << l }
+    end
 
-    # ['Q','Z','J','X','K'].each do |l|
-    #   bag << l
-    # end
+    ['Q','Z','J','X','K'].each do |l|
+      bag << l
+    end
 
     transform(bag)
   end

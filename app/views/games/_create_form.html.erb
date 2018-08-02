@@ -18,7 +18,7 @@
   <% if game %>
     <div class="form-group">
       <%= form.label :invite %>
-      <%= form.collection_select(:invite, User.where(online: true), :id, :name, {prompt: "Optional"}, {class: "form-control"}) %>
+      <%= form.collection_select(:invite, User.where(online: true).select { |user| user.id != current_user.id }, :id, :name, { prompt: "Optional" }, { class: "form-control" }) %>
     </div>
   <% else %>
     <%= form.hidden_field :invite, value: invited %>

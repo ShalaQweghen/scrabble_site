@@ -16,17 +16,17 @@ function addOptionListener(checkBox, list, klass) {
         // When checkBox id filtered, a valid checkbox id remains
         id = id.filter(item => item != checkBox.id)[0];
 
-        let flag = true;
+        let hidable = true;
 
         for (let j = 0; j < cbs.length; j++) {
           if (cbs[j].checked) {
             if (cbs[j].id == id) {
-              flag = false;
+              hidable = false;
             }
           }
         }
 
-        if (flag) {
+        if (hidable) {
           list[i].classList.add("d-none");
         }       
       }
