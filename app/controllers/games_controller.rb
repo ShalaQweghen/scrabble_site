@@ -30,8 +30,8 @@ class GamesController < ApplicationController
     @game = Game.new(game_params)
  
     if @game.save
-      if !game_params[:invite].empty?
-        InviteBroadcastJob.perform_later "invite", { user_id: game_params[:invite] }
+      if !game_params[:invitee].empty?
+        InviteBroadcastJob.perform_later "invite", { user_id: game_params[:invitee] }
       end
 
       redirect_to game_path(@game)
@@ -52,7 +52,7 @@ class GamesController < ApplicationController
     @game = Game.find(params[:id]).destroy
 
     if params[:declined]
-      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.id, invite_id: @game.invite }
+      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.id, invitee_id: @game.invitee }
 
       redirect_to games_path
     else
@@ -63,6 +63,6 @@ class GamesController < ApplicationController
 
   private
     def game_params
-      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit, :invite)
+      params.require(:game).permit(:host_id, :challengable, :time_limit, :points_limit, :invitee)
     end
 end
