@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20180727161917) do
     t.boolean "available", default: true
     t.boolean "forfeited", default: false
     t.bigint "forfeited_by"
-    t.integer "invite"
+    t.bigint "invitee"
     t.index ["host_id"], name: "index_games_on_host_id"
     t.index ["participant_id"], name: "index_games_on_participant_id"
   end
@@ -47,11 +47,16 @@ ActiveRecord::Schema.define(version: 20180727161917) do
     t.datetime "last_sign_in_at"
     t.inet "current_sign_in_ip"
     t.inet "last_sign_in_ip"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "wins", default: 0
     t.integer "losses", default: 0
     t.integer "ties", default: 0
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["name"], name: "index_users_on_name", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
