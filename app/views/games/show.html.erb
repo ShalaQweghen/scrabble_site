@@ -1,16 +1,12 @@
-<div class="wrapper">
-  <div id="board-container">
-    <h1>SCRABBLE</h1>
+<div class="row">
+  <div id="board-container" class="col-12 col-md-6 my-5">
     <div id="board"></div>
     <div id="rack"></div>
-    <div id="buttons" class="text-center mb-5"></div>
+    <div id="buttons" class="text-center"></div>
   </div>
-  <div id="score-container">
-    <div id="clock"></div>
-    <div id="score"></div>
-  </div>
-  <div id="messages-container">
-    <div id="messages" data-gameid="<%= @game.id %>"></div>
+
+  <div id="messages-container" class="col-12 m-auto col-md-6 text-center pb-5">
+    <div id="messages-area" data-gameid="<%= @game.id %>"></div>
   </div>
 </div>
 

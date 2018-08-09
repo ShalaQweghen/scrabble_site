@@ -1,5 +1,5 @@
 window.onload = () ->
-  App.game = App.cable.subscriptions.create { channel: "GameChannel", gameid: document.getElementById("messages").dataset["gameid"] },
+  App.game = App.cable.subscriptions.create { channel: "GameChannel", gameid: document.getElementById("messages-area").dataset["gameid"] },
     connected: ->
       # Called when the subscription has been initiated by the server
 
@@ -9,21 +9,21 @@ window.onload = () ->
     received: (data) ->
       switch data.action
         when "game_init"
-          [playerId, rack, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
+          [playerId, playerName, rack, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
 
           App.gamePlay = new Game()
           App.gamePlay.init(playerId, rack.split(""), true, challengable == "true", timeLimit, pointsLimit)
           @printMessage("Waiting for opponent...")
 
         when "game_start"
-          [opponentId, rack, challengable, timeLimit, pointsLimit, playerId] = data.msg.split(' ')
+          [opponentId, opponentName, rack, challengable, timeLimit, pointsLimit, playerId, playerName] = data.msg.split(' ')
 
           if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponentId
-            App.gamePlay.setOpponent(opponentId)
+            App.gamePlay.setOpponent(opponentId, opponentName)
             @printMessage("Game has started! You play first.")
           else if !App.gamePlay
             App.gamePlay = new Game()
-            App.gamePlay.init(opponentId, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId)
+            App.gamePlay.init(opponentId, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId, playerName)
             @printMessage("Game has started! You play second.")
 
         when "make_move"
@@ -92,7 +92,7 @@ window.onload = () ->
             App.gamePlay.cancelGame()
           
     printMessage: (message) ->
-      $("#messages").html("<p>#{message}</p>")
+      document.getElementById("message").textContent = message
 
     make_move: (move) ->
       @perform 'make_move', data: move

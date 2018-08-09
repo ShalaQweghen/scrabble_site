@@ -1,7 +1,8 @@
 let Game = function() {
-  this.init = function(playerId, letters, firstToGo, challengable, timeLimit, pointsLimit, opponentId=null) {
+  this.init = function(playerId, letters, firstToGo, challengable, timeLimit, pointsLimit, opponentId=null,  opponentName=null) {
     this.playerId = playerId;
     this.opponentId = opponentId;
+    this.opponentName = opponentName;
 
     this.timeLimit = Number(timeLimit);
     this.pointsLimit = Number(pointsLimit);
@@ -67,8 +68,10 @@ let Game = function() {
     }
   }
 
-  this.setOpponent = function(opponentId) {
+  this.setOpponent = function(opponentId, opponentName) {
     this.opponentId = opponentId;
+    this.opponentName = opponentName;
+    this.messagesArea.children[2].textContent = this.opponentName + ": 0";
     this.started = true;
 
     if (this.timeLimit) {
@@ -77,13 +80,12 @@ let Game = function() {
   }
 
   this.prepareInfoArea = function() {
-    this.scoreBoard = document.getElementById("score");
-    this.scoreBoard.innerHTML = '<p>Own Score: 0</p><p>Opponent Score: 0</p><br><p>Letters in Bag: 86</p>';
+    this.messagesArea = document.getElementById("messages-area");
+
+    this.messagesArea.innerHTML = '<p class="float-left">You: 0</p><span id="clock"></span><p class="float-right">' + (this.opponentName || 'Opponent') + ': 0</p><hr class="clear"><p id="message" class="mt-4"></p><hr><p class="my-0">Letters in Bag: 86</p>';
 
     if (this.pointsLimit > 0) {
-      let pointsLimitBox = document.createElement("div");
-      pointsLimitBox.innerHTML = "<p>Points Limit is set to " + this.pointsLimit + ".</p>";
-      document.getElementById("messages-container").appendChild(pointsLimitBox);
+      this.messagesArea.innerHTML += "<p class='my-0'>Points Limit is set to " + this.pointsLimit + ".</p>";
     }
   }
 
@@ -314,7 +316,7 @@ let Game = function() {
       this.activateWordTiles();
       this.replaceRackTiles();
 
-      this.scoreBoard.firstChild.textContent = "Own Score :" + this.totalScore;
+      this.messagesArea.firstChild.textContent = "You:" + this.totalScore;
 
       App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
       App.game.deliver_score(this.totalScore, false);
@@ -515,7 +517,7 @@ let Game = function() {
       this.isFirstMove = false;
     }
 
-    this.scoreBoard.firstChild.textContent = 'Own Score :' + this.totalScore;
+    this.messagesArea.firstChild.textContent = 'You:' + this.totalScore;
   }
 
   this.addTileToWord = function(tile) {
@@ -1090,7 +1092,7 @@ let Game = function() {
           this.populateRack(letters.split(""));
         }
 
-        this.scoreBoard.lastChild.textContent = 'Letters in Bag: ' + letRemaining;
+        this.messagesArea.children[6].textContent = 'Letters in Bag: ' + letRemaining;
 
         this.canChallenge = true;
 
@@ -1115,10 +1117,10 @@ let Game = function() {
       App.game.printMessage("Challenge successful! Your turn...");
     }
 
-    pElems = this.scoreBoard.children;
+    pElems = this.messagesArea.children;
 
-    pElems[0].textContent = 'Own Score: ' + this.totalScore;
-    pElems[1].textContent = 'Opponent Score: ' + score;
+    pElems[0].textContent = 'You: ' + this.totalScore;
+    pElems[1].textContent = this.opponentName + ': ' + score;
     this.opponentScore = score;
   }
 
@@ -1162,7 +1164,7 @@ let Game = function() {
       }
     }
 
-    App.game.printMessage('Own Score: ' + this.totalScore);
+    App.game.printMessage('You: ' + this.totalScore);
     App.game.deliver_score(this.totalScore, true);
   }
 

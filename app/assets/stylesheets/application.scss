@@ -16,69 +16,37 @@ body {
   margin: 0;
   min-height: 100%;
   min-width: 100%;
-  /*background-color: #f2f2f2;*/
   font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
 }
 
 h1, h2 {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 1.25rem; /* 20px */
+  margin-bottom: 1.25rem; /* 20px */
   text-align: center;
   color: #ff3300;
   font-family: cursive;
 }
 
 form {
-  width: 480px;
+  width: 30rem; /* 480px */
   margin: auto;
-}
-
-/* Game Board (games#show) */
-
-sub {
-  color: #64403d;
-  font-size: 9px;
 }
 
 nav {
   background: #f2f2f2;
 }
 
-.wrapper {
-  display: grid;
-  grid-template-columns: repeat(10, 10%);
-  grid-template-rows: repeat(10, auto);
-  padding-bottom: 30px;
-  min-width: 100%;
-  min-height: 100%;
-}
+/* Game Board (games#show) */
 
-#board-container {
-  min-width: 480px;
-  grid-column: 4;
-  grid-row: 1 / span 10;
-}
-
-#score-container {
-  grid-column: 8 / span 3;
-  grid-row: 3 / span 2;
-}
-
-#messages-container {
-  grid-column: 8 / span 3;
-  grid-row: 5 / span 2;
-  text-align: center;
+sub {
+  color: #64403d;
+  font-size: .5625rem; /* 9px */
 }
 
 #board {
   margin: auto;
-  width: 480px;
+  width: 30rem; /* 480px */
   font-size: 0;
-}
-
-#score {
-  padding: 20px;
-  font-weight: bold;
 }
 
 #clock {
@@ -87,22 +55,31 @@ nav {
   color: crimson;
 }
 
-#messages {
+#messages-container {
+  min-width: 30rem; /* 480px */
+}
+
+#messages-area {
   text-align: center;
-  margin-right: 10px;
-  padding: 20px;
-  border: 2px solid #3366ff;
-  border-radius: 5px;
+  margin-right: .625rem; /* 10px */
+  padding: 1.25rem; /* 20px */
+  /*border: 2px solid #3366ff;*/
+  border-radius: .3125rem; /* 5px */
+  background: #f2f2f2;
+}
+
+.clear {
+  clear: both;
 }
 
 .tile, .rack-tile {
   font-weight: bold;
   display: inline-block;
-  width: 32px;
-  height: 32px;
-  padding-top: 1px;
-  padding-left: 5px;
-  font-size: 20px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
+  padding-top: .0625rem; /* 1px */
+  padding-left: .3125rem; /* 5px */
+  font-size: 1.25rem; /* 20px */
   text-align: center;
   vertical-align: bottom;
   border: 1px solid white;
@@ -110,21 +87,21 @@ nav {
 }
 
 #rack {
-  width: 224px;
+  width: 14rem; /* 224px */
   margin: auto;
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 1.875rem; /* 30px */
+  margin-bottom: 1.25rem; /* 20px */
 }
 
 .game-button {
   display: inline-block;
-  font-size: 15px;
+  font-size: .9375rem; /* 15px */
   border: none;
-  width: 100px;
-  height: 30px;
-  margin-top: 10px;
-  margin-right: 5px;
-  border-radius: 5px;
+  width: 6.25rem; /* 100px */
+  height: 1.875rem; /* 30px */
+  margin-top: .625rem; /* 10px */
+  margin-right: .3125rem; /* 5px */
+  border-radius: .3125rem; /* 5px */
   background: #999;
 }
 
@@ -137,11 +114,11 @@ nav {
 
 .status {
   display: inline-block;
-  margin: 0 15px;
+  margin: 0 .9375rem; /* 15px */
 }
 
 .played-game {
-  margin: 5px;
+  margin: .3125rem; /* 5px */
   display: inline-block;
 }
 
@@ -149,8 +126,8 @@ nav {
 
 .online, .offline {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: .625rem; /* 10px */
+  height: .625rem; /* 10px */
   border-radius: 50%;
 }
 
@@ -166,18 +143,18 @@ nav {
 
 #online-users-area {
   overflow-y: auto;
-  max-height: 200px;
+  max-height: 12.5rem; /* 200px */
 }
 
 /* Other */
 
 .join-form {
   display: inline-block;
-  width: 200px;
+  width: 12.5rem; /* 200px */
 }
 
 .small-text {
-  font-size: 10px;
+  font-size: .625rem; /* 10px */
 }
 
 .b-inherit {
@@ -192,7 +169,7 @@ nav {
   right: 0;
   left: 0;
   bottom: 0;
-  padding: 15px 0 5px;
+  padding: .9375rem 0 .3125rem; /* 15px 5px */
   background: #f2f2f2;
 }
 
@@ -202,17 +179,17 @@ nav {
   background: #BE975B;
   text-align: center;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 1.25rem; /* 20px */
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 1.875rem; /* 30px */
+  height: 1.875rem; /* 30px */
   border: 1px solid gray;
   transition-duration: .5s;
   transition-property: transform;
 }
 
 .tLetter > sub {
-  font-size: 10px;
+  font-size: .625rem; /* 10px */
   font-weight: normal;
 }
 
@@ -263,4 +240,11 @@ nav {
 
 .undo-link {
   cursor: pointer;
+}
+
+@media only screen and (max-width: 480px) {
+  form {
+    width: 100%;
+    margin: auto;
+  }
 }

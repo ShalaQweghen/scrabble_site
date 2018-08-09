@@ -1,4 +1,4 @@
-<%= form_with(model: game || Game, local: true) do |form| %>
+<%= form_with(model: game || Game, local: true, class: "pb-5") do |form| %>
   <%= form.hidden_field :host_id, value: current_user.id %>
 
   <div class="row mb-2">
