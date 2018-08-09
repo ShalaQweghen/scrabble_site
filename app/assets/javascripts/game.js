@@ -179,12 +179,22 @@ let Game = function() {
     passButton.className = "game-button";
     passButton.addEventListener('click', function(event) {
       if (that.myTurn && that.opponentId) {
-        let lettersToPass = prompt("Enter letters to change: ").toUpperCase().replace(/[^A-Z]/g, '').split('');
+        let lettersToPass = prompt("Enter letters to change: ").toUpperCase().replace(/[^A-Z ]/g, '').split('');
         let lettersOnRack = that.rackTiles.map(rackTile => rackTile.textContent[0]);
-        lettersToPass = lettersToPass.filter(letter => lettersOnRack.includes(letter));
+
+        /* Remove redundant letters */
+        for (let i = 0; i < lettersToPass.length; i++) {
+          if (lettersOnRack.includes(lettersToPass[i])) {
+            lettersOnRack[lettersOnRack.indexOf(lettersToPass[i])] = null;
+          } else {
+            lettersToPass[i] = null;
+          }
+        }
+
+        lettersToPass = lettersToPass.filter(letter => letter);
         that.passedLetters = lettersToPass;
 
-        // remove any placed tiles off the board
+        // Remove any placed tiles off the board
         for (let i = 0; i < that.rackTiles.length; i++) {
           if (!that.rackTiles[i].innerHTML) {
             let tileOnBoard = that.wordTiles.pop();
@@ -369,7 +379,7 @@ let Game = function() {
         
         if (tile) {
           this.rackTiles[i].innerHTML = '<span></span><sub></sub>';
-          this.rackTiles[i].getElementsByTagName('span')[0].textContent = tile;
+          this.rackTiles[i].getElementsByTagName('span')[0].textContent = tile == "." ? " " : tile;
           this.rackTiles[i].lastChild.textContent = this.letterPoints[tile];
           this.determineTileBackground(this.rackTiles[i]);
         }
@@ -1035,7 +1045,7 @@ let Game = function() {
   this.passLetters = function(letters) {
     this.passes += 1;
 
-    letters = letters.split("")
+    letters = letters.replace(/\./g, ' ').split("")
 
     for (let i = 0; i < letters.length; i++) {
       let rackTile = this.rackTiles.find(tile => tile.textContent[0] === this.passedLetters[i]);

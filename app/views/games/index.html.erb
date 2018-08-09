@@ -1,7 +1,7 @@
 <h1>Join A Game</h1>
 
 <div class="pb-5">
-  <% if @games.select {|game| game.available }.empty? %>
+  <% if @games.select {|game| game.available || game.invitee == current_user.id }.empty? %>
     <h3 class="text-center">NO GAMES CREATED YET</h3>
     <div class="text-center mt-2"><%= link_to "Create a Game", new_game_path, class: "btn btn-info" %></div>
   <% else %>

@@ -18,7 +18,7 @@ class Bag
       4.times { bag << l }
     end
 
-    ['F', 'H', 'V', 'W', 'Y', 'B', 'C', 'M', 'P', ' '].each do |l|
+    ['F', 'H', 'V', 'W', 'Y', 'B', 'C', 'M', 'P', '.'].each do |l|
       2.times { bag << l }
     end
 
@@ -26,25 +26,11 @@ class Bag
       bag << l
     end
 
-    transform(bag)
-  end
-
-  def self.transform(arr)
-    if arr.is_a?(Array)
-      transformed_arr = ""
-
-      arr.each do |l|
-        transformed_arr += l if l
-      end
-    else
-      transformed_arr = arr.split('')
-    end
-
-    transformed_arr
+    bag.join
   end
 
   def self.complete_rack(amount, bag)
-    bag = transform(bag)
+    bag = bag.split("")
     letters = []
 
     amount.times do
@@ -52,14 +38,14 @@ class Bag
       letters << bag.pop
     end
 
-    [transform(letters), transform(bag)]
+    [letters.join, bag.join]
   end
 
   def self.put_back(bag, letters)
-    bag = transform(bag)
+    letters.each do |l|
+      l.blank? ? bag << "." : bag << l
+    end
 
-    letters.each { |l| bag << l }
-
-    transform(bag)
+    bag
   end
 end
