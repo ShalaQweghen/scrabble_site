@@ -61,6 +61,7 @@ let Game = function() {
     this.prepareRack();
     this.prepareButtons();
     this.prepareInfoArea();
+    this.prepareChat();
     this.populateRack(letters);
 
     if (this.timeLimit && this.opponentId) {
@@ -141,6 +142,36 @@ let Game = function() {
       this.addDefaultHandlers(rackTile);
       this.rackTiles.push(rackTile);
       rack.appendChild(rackTile);
+    }
+  }
+
+  this.prepareChat = function() {
+    this.chatArea = document.getElementById("chat");
+
+    chatInput = document.getElementById("chat-input");
+
+    let that = this;
+
+    chatInput.addEventListener("keypress", function(event) {
+      if (event.key == "Enter") {
+        if (that.chatArea.value == "") {
+          that.chatArea.value = "Me: " + chatInput.value;
+        } else {
+          that.chatArea.value += '\n' + "Me: " + chatInput.value;
+        }
+
+        App.game.transmitChat(chatInput.value.replace(/[ ]/g, '•'));
+
+        chatInput.value = "";
+      }
+    });
+  }
+
+  this.writeToChat = function(message) {
+    if (this.chatArea.value == "") {
+      this.chatArea.value = this.opponentName + ": " + message.replace(/[•]/g, ' ');
+    } else {
+      this.chatArea.value += '\n' + this.opponentName + ": " + message.replace(/[•]/g, ' ');;
     }
   }
 

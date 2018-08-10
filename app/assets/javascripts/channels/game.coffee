@@ -90,6 +90,12 @@ window.onload = () ->
         when "forfeit"
           if App.gamePlay.playerId == data.msg
             App.gamePlay.cancelGame()
+
+        when "transmit_chat"
+          [playerId, message] = data.msg.split(" ")
+
+          if App.gamePlay.playerId == playerId
+            App.gamePlay.writeToChat(message)
           
     printMessage: (message) ->
       document.getElementById("message").textContent = message
@@ -126,3 +132,6 @@ window.onload = () ->
 
     forfeit: (score) ->
       @perform 'forfeit', data: score
+
+    transmitChat: (message) ->
+      @perform 'transmit_chat', data: message

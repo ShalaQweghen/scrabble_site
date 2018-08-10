@@ -38,38 +38,10 @@ nav {
 
 /* Game Board (games#show) */
 
-sub {
-  color: #64403d;
-  font-size: .5625rem; /* 9px */
-}
-
 #board {
   margin: auto;
   width: 30rem; /* 480px */
   font-size: 0;
-}
-
-#clock {
-  text-align: center;
-  font-weight: bold;
-  color: crimson;
-}
-
-#messages-container {
-  min-width: 30rem; /* 480px */
-}
-
-#messages-area {
-  text-align: center;
-  margin-right: .625rem; /* 10px */
-  padding: 1.25rem; /* 20px */
-  /*border: 2px solid #3366ff;*/
-  border-radius: .3125rem; /* 5px */
-  background: #f2f2f2;
-}
-
-.clear {
-  clear: both;
 }
 
 .tile, .rack-tile {
@@ -84,6 +56,11 @@ sub {
   vertical-align: bottom;
   border: 1px solid white;
   cursor: pointer;
+}
+
+sub {
+  color: #64403d;
+  font-size: .5625rem; /* 9px */
 }
 
 #rack {
@@ -108,6 +85,52 @@ sub {
 .game-button:hover {
   cursor: pointer;
   background-color: #666699;
+}
+
+#side-container {
+  margin-top: 3rem;
+}
+
+#messages-container {
+  min-width: 30rem; /* 480px */
+}
+
+#messages-area {
+  text-align: center;
+  margin-right: .625rem; /* 10px */
+  padding: 1.25rem; /* 20px */
+  /*border: 2px solid #3366ff;*/
+  border-radius: .3125rem; /* 5px */
+  background: #f2f2f2;
+}
+
+#clock {
+  text-align: center;
+  font-weight: bold;
+  color: crimson;
+}
+
+.clear {
+  clear: both;
+}
+
+textarea, textarea + input {
+  border: 1px solid #b6b0b0;
+  color: darkblue;
+  border-left: none;
+  border-right: none;
+  padding: .3125rem; /* 5px */
+}
+
+textarea {
+  resize: none;
+  background: transparent;
+  font-size: .875rem; /* 14px */
+  border-bottom: none;
+}
+
+textarea + input {
+  border-top: none;
 }
 
 /* users#show */
@@ -240,6 +263,12 @@ sub {
 
 .undo-link {
   cursor: pointer;
+}
+
+@media only screen and (max-width: 778px) {
+  #side-container {
+    margin-top: 0;
+  }
 }
 
 @media only screen and (max-width: 480px) {

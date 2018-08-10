@@ -145,6 +145,12 @@ class Game < ApplicationRecord
      ActionCable.server.broadcast "game-#{game.id}", { action: "forfeit", msg: "#{opponent}" }
   end
 
+  def self.transmit_chat(user, game_id, message)
+    opponent = opponent_for(user)
+
+    ActionCable.server.broadcast "game-#{game_id}", { action: "transmit_chat", msg: "#{opponent} #{message["data"]}" }
+  end
+
   def self.opponent_for(user)
     REDIS.get("opponent_for:#{user}")
   end

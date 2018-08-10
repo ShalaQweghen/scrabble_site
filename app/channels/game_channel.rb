@@ -65,4 +65,8 @@ class GameChannel < ApplicationCable::Channel
   def forfeit(data)
     Game.forfeit(current_user, @game, data)
   end
+
+  def transmit_chat(data)
+    Game.transmit_chat(current_user, @game_id, data)
+  end
 end

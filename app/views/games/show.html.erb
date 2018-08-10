@@ -5,8 +5,15 @@
     <div id="buttons" class="text-center"></div>
   </div>
 
-  <div id="messages-container" class="col-12 m-auto col-md-6 text-center pb-5">
-    <div id="messages-area" data-gameid="<%= @game.id %>"></div>
+  <div id="side-container" class="col-12 mx-auto col-md-6 text-center pb-5">
+    <div id="messages-container">
+      <div id="messages-area" data-gameid="<%= @game.id %>"></div>
+    </div>
+
+    <div id="chat-container" class="mt-5">
+      <textarea id="chat" class="d-block w-100" rows="6" disabled readonly></textarea>
+      <input type="text" name="chat" id="chat-input" class="w-100" autofocus placeholder="Enter your message here...">
+    </div>
   </div>
 </div>
 
