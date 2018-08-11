@@ -19,7 +19,7 @@ module ApplicationHelper
             content_tag(:span, nil, class: "offline mr-2", title: "Offline")
           end + 
 
-          (link_to user.name, user_path(user.id)) + " -> #{user.score} points"
+          (link_to user.name, user_path(user.slug)) + " -> #{user.score} points"
         end)
       end
 
@@ -52,7 +52,7 @@ module ApplicationHelper
         link_to "Join", games_path, class: "nav-link"
       end) +
       (content_tag(:li, class: "nav-item") do
-        link_to "Account", user_path(current_user), class: "nav-link"
+        link_to "Account", user_path(current_user.slug), class: "nav-link"
       end) + 
       (content_tag(:li, class: "nav-item") do
         link_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link"

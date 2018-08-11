@@ -23,7 +23,7 @@
           for (let i = 0; i < data.length; i++) {
 
             let a = document.createElement("A");
-            a.setAttribute("href", "/users/" + data[i].id);
+            a.setAttribute("href", "/users/" + data[i].slug);
             a.classList.add("dropdown-item");
 
             if (document.getElementById("board")) {
