@@ -1,4 +1,8 @@
 class Game < ApplicationRecord
+  extend FriendlyId
+
+  friendly_id :hash_slug, use: :slugged
+
   belongs_to :host, class_name: "User"
   belongs_to :participant, class_name: "User", optional: true
   
@@ -7,9 +11,9 @@ class Game < ApplicationRecord
 
     rack, bag = Bag.complete_rack(7, bag)
 
-    REDIS.set("game_bag_#{game.id}", bag)
+    REDIS.set("game_bag_#{game.hash_slug}", bag)
 
-    ActionCable.server.broadcast "game-#{game.id}", { action: "game_init", msg: "#{game.host.id} #{game.host.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit}" }
+    ActionCable.server.broadcast "game-#{game.hash_slug}", { action: "game_init", msg: "#{game.host.id} #{game.host.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit}" }
   end
 
   def self.start(game)
@@ -17,14 +21,14 @@ class Game < ApplicationRecord
       game.toggle!(:available)
     end
 
-    bag = REDIS.get("game_bag_#{game.id}")
+    bag = REDIS.get("game_bag_#{game.hash_slug}")
     rack, bag = Bag.complete_rack(7, bag)
 
     REDIS.set("opponent_for:#{game.host.id}", game.participant.id)
     REDIS.set("opponent_for:#{game.participant.id}", game.host.id)
-    REDIS.set("game_bag_#{game.id}", bag)
+    REDIS.set("game_bag_#{game.hash_slug}", bag)
 
-    ActionCable.server.broadcast "game-#{game.id}", { action: "game_start", msg: "#{game.participant.id} #{game.participant.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit} #{game.host.id} #{game.host.name}" }
+    ActionCable.server.broadcast "game-#{game.hash_slug}", { action: "game_start", msg: "#{game.participant.id} #{game.participant.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit} #{game.host.id} #{game.host.name}" }
   end
 
   def self.make_move(user, game_id, move)
@@ -142,7 +146,7 @@ class Game < ApplicationRecord
       game.participant.increment!(:losses)
     end
 
-     ActionCable.server.broadcast "game-#{game.id}", { action: "forfeit", msg: "#{opponent}" }
+     ActionCable.server.broadcast "game-#{game.hash_slug}", { action: "forfeit", msg: "#{opponent}" }
   end
 
   def self.transmit_chat(user, game_id, message)

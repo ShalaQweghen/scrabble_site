@@ -7,7 +7,7 @@ class GamesController < ApplicationController
 
   def show
     begin
-      @game = Game.find(params[:id])
+      @game = Game.friendly.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       redirect_to root_path
       return
@@ -30,6 +30,8 @@ class GamesController < ApplicationController
     @game = Game.new(game_params)
  
     if @game.save
+      @game.update!(hash_slug: SecureRandom.uuid)
+
       if !game_params[:invitee].empty?
         InviteBroadcastJob.perform_later "invite", { user_id: game_params[:invitee], invt_amt: User.find(game_params[:invitee]).times_invited }
       end
@@ -41,7 +43,7 @@ class GamesController < ApplicationController
   end
 
   def update
-    game = Game.find(params[:game][:game_id])
+    game = Game.friendly.find(params[:game][:game_id])
     game.update!(participant: current_user)
     game.toggle!(:available)
 
@@ -49,15 +51,10 @@ class GamesController < ApplicationController
   end
 
   def destroy
-    begin
-      @game = Game.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      redirect_to root_path
-      return
-    end
+    @game = Game.friendly.find(params[:id]).destroy
 
     if params[:declined]
-      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.id, invitee_id: @game.invitee }
+      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.hash_slug, invitee_id: @game.invitee }
 
       redirect_to games_path
     else

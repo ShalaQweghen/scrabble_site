@@ -3,7 +3,7 @@ class GameChannel < ApplicationCable::Channel
     stream_from "game-#{params['gameid']}"
 
     @game_id = params['gameid']
-    @game = Game.find(@game_id)
+    @game = Game.friendly.find(@game_id)
 
     if @game.participant
       Game.start(@game)

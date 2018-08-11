@@ -20,7 +20,7 @@
         <% if game.available && game.invitee == current_user.id %>
           <div class="join-form">
             <%= render "join_form", game: game %>
-            <%= link_to "Decline", game_path(game.id, declined: true), method: :delete, class: "btn btn-warning d-block" %>
+            <%= link_to "Decline", game_path(game.hash_slug, declined: true), method: :delete, class: "btn btn-warning d-block" %>
           </div>
         <% end %>
       <% end %>
