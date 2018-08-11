@@ -10,4 +10,8 @@ class User < ApplicationRecord
   def invited?
     !Game.where(invitee: id, available: true).empty?
   end
+
+  def times_invited
+    Game.where(invitee: id, available: true).count
+  end
 end

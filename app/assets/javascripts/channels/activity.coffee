@@ -8,7 +8,9 @@ App.activity = App.cable.subscriptions.create "ActivityChannel",
   received: (data) ->
     switch data.action
       when "show_invite"
-        document.getElementById("invitation").classList.remove("invisible")
+        invitationLink = document.getElementById("invitation")
+        invitationLink.lastChild.textContent = data.msg
+        invitationLink.classList.remove("invisible")
         
       when "show_decline"
         [gameId, userId] = data.msg.split(" ")
