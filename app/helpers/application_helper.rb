@@ -1,6 +1,6 @@
 module ApplicationHelper
   def invitation_link
-    link_to("/games/#invitations", id: "invitation", target: "_blank", class: "btn btn-danger btn-sm mb-1 mr-2 #{" invisible" if !user_signed_in? || !current_user.invited?}") do
+    link_to("/games/#invitations", id: "invitation", class: "btn btn-danger btn-sm mb-1 mr-2 #{" invisible" if !user_signed_in? || !current_user.invited?}") do
       (fa_icon "envelope") + content_tag(:sup, user_signed_in? ? current_user.times_invited : "")
     end
   end

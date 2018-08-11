@@ -5,6 +5,7 @@
     <script type="text/javascript">scrabblize("ScrabbIA", document.getElementsByClassName("navbar-brand")[0], "/", true);</script>
 
     <%= invitation_link %>
+    <script type="text/javascript">document.getElementById("invitation").setAttribute("target", "_blank");</script>
   <% else %>
     <script type="text/javascript">scrabblize("ScrabbIA", document.getElementsByClassName("navbar-brand")[0], "/", false);</script>
   <% end %>
