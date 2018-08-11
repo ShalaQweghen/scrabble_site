@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180811134011) do
+ActiveRecord::Schema.define(version: 20180811203451) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(version: 20180811134011) do
     t.boolean "challengable"
     t.integer "time_limit"
     t.integer "points_limit"
-    t.integer "host_score"
-    t.integer "part_score"
+    t.integer "host_score", default: 0
+    t.integer "part_score", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "host_id"
@@ -41,9 +41,7 @@ ActiveRecord::Schema.define(version: 20180811134011) do
     t.boolean "forfeited", default: false
     t.bigint "forfeited_by"
     t.bigint "invitee"
-    t.string "hash_slug"
     t.string "slug"
-    t.index ["hash_slug"], name: "index_games_on_hash_slug"
     t.index ["host_id"], name: "index_games_on_host_id"
     t.index ["participant_id"], name: "index_games_on_participant_id"
     t.index ["slug"], name: "index_games_on_slug", unique: true

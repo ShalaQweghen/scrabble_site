@@ -1,9 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-light px-5">
   <div class="navbar-brand"></div>
-  <script type="text/javascript">scrabblize("ScrabbIA", document.getElementsByClassName("navbar-brand")[0], "/");</script>
 
   <% if request.parameters["controller"] == "games" && request.parameters["action"] == "show" %>
+    <script type="text/javascript">scrabblize("ScrabbIA", document.getElementsByClassName("navbar-brand")[0], "/", true);</script>
+
     <%= invitation_link %>
+  <% else %>
+    <script type="text/javascript">scrabblize("ScrabbIA", document.getElementsByClassName("navbar-brand")[0], "/", false);</script>
   <% end %>
   
   <% if request.parameters["controller"] != "games" || request.parameters["action"] != "show" %>
@@ -14,7 +17,7 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
       <%= invitation_link %>
 
-      <% if current_user %>
+      <% if user_signed_in? %>
         <%= render "shared/online_users" %>
 
         <%= render "shared/leader_board" %>

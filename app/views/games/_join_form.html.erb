@@ -1,5 +1,5 @@
 <%= form_with(model: game, html: { class: "mb-3 mr-2 text-center join-form" }) do |form| %>
-  <%= form.hidden_field :game_id, value: game.hash_slug %>
+  <%= form.hidden_field :game_id, value: game.slug %>
   <h5><b>by <i><%= game.host.name %></i></b></h5>
 
   <% if game.challengable %>

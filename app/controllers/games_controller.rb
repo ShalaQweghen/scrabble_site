@@ -30,8 +30,6 @@ class GamesController < ApplicationController
     @game = Game.new(game_params)
  
     if @game.save
-      @game.update!(hash_slug: SecureRandom.uuid)
-
       if !game_params[:invitee].empty?
         InviteBroadcastJob.perform_later "invite", { user_id: game_params[:invitee], invt_amt: User.find(game_params[:invitee]).times_invited }
       end
@@ -54,7 +52,7 @@ class GamesController < ApplicationController
     @game = Game.friendly.find(params[:id]).destroy
 
     if params[:declined]
-      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.hash_slug, invitee_id: @game.invitee }
+      InviteBroadcastJob.perform_later "decline", { user_id: @game.host_id, game_id: @game.slug, invitee_id: @game.invitee }
 
       redirect_to games_path
     else

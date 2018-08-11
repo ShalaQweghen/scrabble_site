@@ -1161,7 +1161,7 @@ let Game = function() {
     pElems = this.messagesArea.children;
 
     pElems[0].textContent = 'You: ' + this.totalScore;
-    pElems[1].textContent = this.opponentName + ': ' + score;
+    pElems[2].textContent = this.opponentName + ': ' + score;
     this.opponentScore = score;
   }
 

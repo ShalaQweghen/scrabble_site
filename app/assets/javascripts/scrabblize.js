@@ -1,4 +1,6 @@
-function scrabblize(word, cont, path) {
+function scrabblize(word, cont, path, blank) {
+  let link = document.createElement("A");
+
   for (let i = 0; i < word.length; i++) {
     let div = document.createElement("DIV");
 
@@ -12,33 +14,38 @@ function scrabblize(word, cont, path) {
     div.classList.add("tLetter" + a);
     div.innerHTML = word.charAt(i) + "<sub>?</sub>";
 
-    cont.appendChild(div);
+    link.appendChild(div);
   }
 
+  if (path) {
+    link.href = path;
+  }
+
+  if (blank) {
+    link.setAttribute("target", "_blank");
+  }
+
+  cont.appendChild(link);
+
+  let tLetters = cont.firstChild.children;
 
   cont.addEventListener("mouseenter", function(event) {
-    for (let i = 0; i < cont.children.length; i++) {
-      cont.children[i].classList.add("undo");
+    for (let i = 0; i < tLetters.length; i++) {
+      tLetters[i].classList.add("undo");
 
       if (path) {
-        cont.children[i].classList.add("undo-link");
+        tLetters[i].classList.add("undo-link");
       }
     }
   })
 
   cont.addEventListener("mouseleave", function(event) {
-    for (let i = 0; i < cont.children.length; i++) {
-      cont.children[i].classList.remove("undo");
+    for (let i = 0; i < tLetters.length; i++) {
+      tLetters[i].classList.remove("undo");
 
       if (path) {
-        cont.children[i].classList.remove("undo-link");
+        tLetters[i].classList.remove("undo-link");
       }
     }
   })
-
-  if (path) {
-    cont.addEventListener("click", function(event) {
-      window.location.href = path;
-    })
-  }
 }
