@@ -2,12 +2,22 @@
   <div id="board-container" class="col-12 col-md-6 my-5">
     <div id="board"></div>
     <div id="rack"></div>
-    <div id="buttons" class="text-center"></div>
+    <div id="buttons" class="text-center">
+      <button id="submit" class="game-button">Submit</button>
+      <button id="pass" class="game-button">Pass</button>
+
+      <% if @game.challengable %>
+        <button id="challenge" class="game-button">Challenge</button>
+      <% end %>
+
+      <button id="shuffle" class="game-button">Shuffle</button>
+    </div>
   </div>
 
   <div id="side-container" class="col-12 mx-auto col-md-6 text-center pb-5">
     <div id="messages-container">
       <div id="messages-area" data-gameid="<%= @game.slug %>"></div>
+      <button id="forfeit" class="btn btn-danger btn-sm mt-3">Forfeit</button>
     </div>
 
     <div id="chat-container" class="mt-5">

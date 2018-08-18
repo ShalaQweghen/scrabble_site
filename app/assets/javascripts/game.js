@@ -65,7 +65,7 @@ let Game = function() {
 
       this.prepareBoard();
       this.prepareRack();
-      this.prepareButtons();
+      this.addButtonHandlers();
       this.prepareInfoArea();
       this.prepareChat();
       this.addDialogueHandlers();
@@ -359,34 +359,24 @@ let Game = function() {
     }
   }
 
-  this.prepareButtons = function() {
+  this.addButtonHandlers = function() {
     if (!this.gameIsReady) {
-      let buttonsArea = document.getElementById("buttons");
-
-      let submitButton = document.createElement('button');
-      submitButton.textContent = "Submit";
-      submitButton.className = "game-button";
+      let submitButton = document.getElementById('submit');
       submitButton.addEventListener('click', event => {
         if (this.myTurn && this.opponentId) {
           this.setWildTileAndSubmit();
         }
       });
-      buttonsArea.appendChild(submitButton);
 
-      let passButton = document.createElement('button');
-      passButton.textContent = "Pass";
-      passButton.className = "game-button";
+      let passButton = document.getElementById('pass');
       passButton.addEventListener('click', event => {
         if (this.myTurn && this.opponentId) {
           this.showDialogue("Enter letters to change: ", null);
         }
       });
-      buttonsArea.appendChild(passButton);
 
       if (this.challengable) {
-        let challengeButton = document.createElement("button");
-        challengeButton.textContent = "Challenge";
-        challengeButton.className = "game-button";
+        let challengeButton = document.getElementById("challenge");
         challengeButton.addEventListener('click', event => {
           if (this.myTurn && !this.isFirstMove && this.canChallenge && this.opponentId) {
             this.removeTilesFromBoard();
@@ -396,13 +386,9 @@ let Game = function() {
             App.game.challenge(false);
           }
         })
-
-        buttonsArea.appendChild(challengeButton);
       }
 
-      let shuffleButton = document.createElement('button');
-      shuffleButton.textContent = "Shuffle";
-      shuffleButton.className = "game-button";
+      let shuffleButton = document.getElementById('shuffle');
       shuffleButton.addEventListener('click', event => {
         let tiles = [];
 
@@ -423,11 +409,8 @@ let Game = function() {
           this.determineTileBackground(this.rackTiles[i]);
         }
       });
-      buttonsArea.appendChild(shuffleButton);
 
-      let forfeitButton = document.createElement('button');
-      forfeitButton.textContent = "Forfeit";
-      forfeitButton.className = "btn btn-danger btn-sm mt-3";
+      let forfeitButton = document.getElementById('forfeit');
       forfeitButton.addEventListener('click', event => {
         if (this.started) {
           if (confirm("Are you sure to forfeit the game? 50 points will be deducted from your overall score.")) {
@@ -435,7 +418,6 @@ let Game = function() {
           }
         }
       });
-      document.getElementById("messages-container").appendChild(forfeitButton);
     }
   }
 
