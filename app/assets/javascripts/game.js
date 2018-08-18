@@ -448,9 +448,9 @@ let Game = function() {
             }
 
             App.game.transmitChat(chatInput.value.replace(/[ ]/g, '•'));
-          } else {
-            chatInput.value = "";
-          } 
+          }
+          
+          chatInput.value = ""; 
         }
       });
     }
@@ -860,8 +860,9 @@ let Game = function() {
     p.textContent = message;
 
     outerDiv.classList.remove("d-none");
-    
+
     cancelButton.addEventListener("click", event => {
+      input.value = "";
       outerDiv.classList.add("d-none")
     });
 
@@ -877,9 +878,13 @@ let Game = function() {
 
         App.game.make_move(wT.id + " " + wildLetterValue + "*")
 
+        input.value = "";
+
         this.submit();
       } else if (!wT && lettersToPass) {
         outerDiv.classList.add("d-none")
+
+        input.value = "";
 
         this.pass(lettersToPass.split(""));
       }
