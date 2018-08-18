@@ -1,105 +1,147 @@
-let Game = function() {
+let Game = () => {
+  let playerId,
+      opponentId, 
+      opponentName, 
+      timeLimit, 
+      pointsLimit,
+      tileClicked, 
+      draggedTile, 
+      rackTiles, 
+      wordTiles, 
+      word, 
+      words,
+      isFirstMove, 
+      myTurn, 
+      started, 
+      passedLetters, 
+      passes, 
+      passingEnd,
+      challengable, 
+      canChallenge, 
+      isChallenged, 
+      challenging,
+      drawnTiles, 
+      prevTurnTiles, 
+      prevTurnScore, 
+      deductedPoints,
+      prevWordTiles, 
+      prevWords, 
+      finalChallengeAlreadyDone,
+      aboutToEnd, 
+      totalScore, 
+      opponentScore, 
+      letterPoints,
+      doubleLetterBonus, 
+      tripleLetterBonus,
+      doubleWordBonus, 
+      tripleWordBonus, 
+      gameIsReady,
+      messagesArea, 
+      chatArea;
+
   /********************************************************************
   /* START -> Methods that get called from channel script Game.coffee *
   /********************************************************************/
 
-  this.init = function(playerId, letters, firstToGo, challengable, timeLimit, pointsLimit, opponentId=null,  opponentName=null) {
+  let init = (pId, letters, firstToGo, chllngable, tLimit, ptsLimit, opId=null, opName=null) => {
     // Make sure this method is called only at the beginning
-    if (!this.playerId) {
-      this.playerId = playerId;
-      this.opponentId = opponentId;
-      this.opponentName = opponentName;
+    if (!playerId) {
+      playerId = pId;
+      opponentId = opId;
+      opponentName = opName;
 
-      this.timeLimit = Number(timeLimit);
-      this.pointsLimit = Number(pointsLimit);
+      timeLimit = Number(tLimit);
+      pointsLimit = Number(ptsLimit);
 
-      this.tileClicked = '';
-      this.draggedTile = null;
+      tileClicked = '';
+      draggedTile = null;
 
-      this.rackTiles = [];
+      rackTiles = [];
 
-      this.wordTiles = [];
-      this.word = '';
-      this.words = [];
+      wordTiles = [];
+      word = '';
+      words = [];
 
-      this.isFirstMove = firstToGo;
-      this.myTurn = firstToGo;
-      this.started = !!this.opponentId;
+      isFirstMove = firstToGo;
+      myTurn = firstToGo;
+      started = !!opponentId;
 
-      this.passedLetters = [];
-      this.passes = 0;
-      this.passingEnd = false;
+      passedLetters = [];
+      passes = 0;
+      passingEnd = false;
 
-      this.challengable = challengable;
-      this.canChallenge = true;
-      this.isChallenged = false;
-      this.challenging = false;
-      this.drawnTiles = [];
-      this.prevTurnScore = 0;
-      this.deductedPoints = 0;
-      this.prevWordTiles = [];
-      this.prevWords = [];
-      this.finalChallengeAlreadyDone = false;
+      challengable = chllngable;
+      canChallenge = true;
+      isChallenged = false;
+      challenging = false;
+      drawnTiles = [];
+      prevTurnScore = 0;
+      deductedPoints = 0;
+      prevWordTiles = [];
+      prevWords = [];
+      finalChallengeAlreadyDone = false;
 
-      this.aboutToEnd = false;
+      aboutToEnd = false;
 
-      this.totalScore = 0;
-      this.opponentScore = 0;
+      totalScore = 0;
+      opponentScore = 0;
 
-      this.letterPoints = {};
-      'LSUNRTOAIE'.split('').forEach(l => this.letterPoints[l] = 1);
-      'GD'.split('').forEach(l => this.letterPoints[l] = 2);
-      'BCMP'.split('').forEach(l => this.letterPoints[l] = 3);
-      'FHVWY'.split('').forEach(l => this.letterPoints[l] = 4);
-      'JX'.split('').forEach(l => this.letterPoints[l] = 8);
-      'QZ'.split('').forEach(l => this.letterPoints[l] = 10);
-      this.letterPoints['K'] = 5;
-      this.letterPoints[' '] = 0;
+      letterPoints = {};
+      'LSUNRTOAIE'.split('').forEach(l => letterPoints[l] = 1);
+      'GD'.split('').forEach(l => letterPoints[l] = 2);
+      'BCMP'.split('').forEach(l => letterPoints[l] = 3);
+      'FHVWY'.split('').forEach(l => letterPoints[l] = 4);
+      'JX'.split('').forEach(l => letterPoints[l] = 8);
+      'QZ'.split('').forEach(l => letterPoints[l] = 10);
+      letterPoints['K'] = 5;
+      letterPoints[' '] = 0;
 
-      this.doubleLetterBonus = 'a4 a12 c7 c9 d1 d8 d15 g3 g7 g9 g13 h4 h12 o4 o12 m7 m9 l1 l8 l15 i3 i7 i9 i13'.split(' ');
-      this.tripleLetterBonus = 'b6 b10 n6 n10 f2 f6 f10 f14 j2 j6 j10 j14'.split(' ');
-      this.doubleWordBonus = 'h8 b2 c3 d4 e5 b14 c13 d12 e11 n2 m3 l4 k5 n14 m13 l12 k11'.split(' ');
-      this.tripleWordBonus = 'a1 a8 a15 h15 o15 h1 o8 o1'.split(' ');
+      doubleLetterBonus = 'a4 a12 c7 c9 d1 d8 d15 g3 g7 g9 g13 h4 h12 o4 o12 m7 m9 l1 l8 l15 i3 i7 i9 i13'.split(' ');
+      tripleLetterBonus = 'b6 b10 n6 n10 f2 f6 f10 f14 j2 j6 j10 j14'.split(' ');
+      doubleWordBonus = 'h8 b2 c3 d4 e5 b14 c13 d12 e11 n2 m3 l4 k5 n14 m13 l12 k11'.split(' ');
+      tripleWordBonus = 'a1 a8 a15 h15 o15 h1 o8 o1'.split(' ');
 
-      this.gameIsReady = false; // This flag is to prevent these functions to be called again from console.
+      gameIsReady = false; // This flag is to prevent these functions to be called again from console.
 
-      this.prepareBoard();
-      this.prepareRack();
-      this.addButtonHandlers();
-      this.prepareInfoArea();
-      this.prepareChat();
-      this.populateRack(letters);
+      prepareBoard();
+      prepareRack();
+      addButtonHandlers();
+      prepareInfoArea();
+      prepareChat();
+      populateRack(letters);
 
-      if (this.timeLimit && this.opponentId) {
-        this.startCountdown();
+      if (timeLimit && opponentId) {
+        startCountdown();
       }
 
-      this.gameIsReady = true;
+      gameIsReady = true;
     }
   }
 
-  this.setOpponent = function(opponentId, opponentName) {
-    this.opponentId = opponentId;
-    this.opponentName = opponentName;
-    this.messagesArea.children[2].textContent = this.opponentName + ": 0";
-    this.started = true;
+  let setOpponent = (opId, opName) => {
+    if (!opponentId) {
+      opponentId = opId;
+      opponentName = opName;
+      messagesArea.children[2].textContent = opponentName + ": 0";
+      started = true;
 
-    if (this.timeLimit) {
-      this.startCountdown();
+      if (timeLimit) {
+        startCountdown();
+      }
     }
   }
 
-  this.writeToChat = function(message) {
+  let writeToChat = (message) => {
     // If this is the very first message to be written, no need for a new line.
     // • was for preventing to break code because of space between words.
-    if (this.chatArea.value == "") {
-      this.chatArea.value = this.opponentName + ": " + message.replace(/[•]/g, ' ');
+    if (chatArea.value == "") {
+      chatArea.value = opponentName + ": " + message.replace(/[•]/g, ' ');
     } else {
-      this.chatArea.value += '\n' + this.opponentName + ": " + message.replace(/[•]/g, ' ');;
+      chatArea.value += '\n' + opponentName + ": " + message.replace(/[•]/g, ' ');;
     }
   }
 
-  this.placeTile = function(id, letter) {
+  let placeTile = (id, letter) => {
     // If the letter to be placed is wild tile, '*' is appended to the letter
     letter = letter.split("");
 
@@ -112,115 +154,115 @@ let Game = function() {
     if (letter.length > 1) {
       tile.getElementsByTagName("sub")[0].textContent = 0;
     } else {
-      tile.getElementsByTagName("sub")[0].textContent = this.letterPoints[letter[0]];
+      tile.getElementsByTagName("sub")[0].textContent = letterPoints[letter[0]];
     }
 
-    this.determineTileBackground(tile);
+    determineTileBackground(tile);
   }
 
-  this.removeTile = function(id) {
+  let removeTile = id => {
     let tile = document.getElementById(id);
     tile.innerHTML = "";
     tile.draggable = true;
-    this.determineTileBackground(tile);
+    determineTileBackground(tile);
   }
 
-  this.processValidWords = function() {
-    if (this.aboutToEnd) {
+  let processValidWords = () => {
+    if (aboutToEnd) {
       // It was the last word to be challenged.
-      App.game.deliver_score(this.totalScore, true);
-    } else if (this.isChallenged) {
+      App.game.deliver_score(totalScore, true);
+    } else if (isChallenged) {
       // The word was challenged and proved to be valid. Turn passes. No letters to be drawn.
-      App.game.switch_turn(0, this.passes);
-    } else if (this.word) {
+      App.game.switch_turn(0, passes);
+    } else if (word) {
       // Good old valid word.
-      this.totalScore += this.calcPoints();
-      this.deactivateWordTiles();
-      this.resetTurn();
+      totalScore += calcPoints();
+      deactivateWordTiles();
+      resetTurn();
 
-      App.game.deliver_score(this.totalScore, false);
-      App.game.switch_turn(7 - this.rackTiles.filter(node => node.innerHTML).length, this.passes);
+      App.game.deliver_score(totalScore, false);
+      App.game.switch_turn(7 - rackTiles.filter(node => node.innerHTML).length, passes);
 
-      this.passes = 0;
+      passes = 0;
     } else {
       App.game.printMessage("Tile placement is not valid!");
     }
   }
 
-  this.processInvalidWords = function(word) {
-    if (this.isChallenged) {
-      this.aboutToEnd = false;
-      this.isChallenged = false;
-      this.totalScore -= this.prevTurnScore;
+  let processInvalidWords = word => {
+    if (isChallenged) {
+      aboutToEnd = false;
+      isChallenged = false;
+      totalScore -= prevTurnScore;
 
-      this.activateWordTiles();
-      this.replaceRackTiles();
+      activateWordTiles();
+      replaceRackTiles();
 
-      this.messagesArea.firstChild.textContent = "You: " + this.totalScore;
+      messagesArea.firstChild.textContent = "You: " + totalScore;
 
       App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
-      App.game.deliver_score(this.totalScore, false);
+      App.game.deliver_score(totalScore, false);
     } else {
       App.game.printMessage("'" + word + "' is not a valid word!");
     }
 
-    this.words = [];
+    words = [];
   }
 
-  this.challenge = function(last) {
-    this.aboutToEnd = last;
-    this.isChallenged = true;
+  let challenge = last => {
+    aboutToEnd = last;
+    isChallenged = true;
 
-    let wordsAsString = this.prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+    let wordsAsString = prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
 
     App.game.validate_words(wordsAsString);
   }
 
-  this.passLetters = function(letters) {
-    this.passes += 1;
+  let passLetters = letters => {
+    passes += 1;
 
     letters = letters.replace(/\./g, ' ').split("")
 
     for (let i = 0; i < letters.length; i++) {
-      let rackTile = this.rackTiles.find(tile => tile.textContent[0] === this.passedLetters[i]);
+      let rackTile = rackTiles.find(tile => tile.textContent[0] === passedLetters[i]);
       rackTile.getElementsByTagName('span')[0].textContent = letters[i];
-      rackTile.lastChild.textContent = this.letterPoints[letters[i]];
+      rackTile.lastChild.textContent = letterPoints[letters[i]];
     }
 
-    App.game.switch_turn(0, this.passes);
+    App.game.switch_turn(0, passes);
   }
 
-  this.switchTurn = function(letters, letRemaining, passes, gameOver) {
-    this.myTurn = !this.myTurn;
-    this.finalChallengeAlreadyDone = false;
+  let switchTurn = (letters, letRemaining, numPasses, gameOver) => {
+    myTurn = !myTurn;
+    finalChallengeAlreadyDone = false;
 
-    if (this.pointsLimit && (this.opponentScore >= this.pointsLimit || this.totalScore >= this.pointsLimit)) {
+    if (pointsLimit && (opponentScore >= pointsLimit || totalScore >= pointsLimit)) {
       App.game.finalize_game(false, true, false);
     } else {
-      if (this.myTurn) {
-        this.drawnTiles = [];
+      if (myTurn) {
+        drawnTiles = [];
       }
 
-      if (this.passes >= 3 && Number(passes) >= 3) {
+      if (passes >= 3 && Number(numPasses) >= 3) {
         App.game.finalize_game(true, false, false);
-      } else if (gameOver == "true" && this.rackTiles.every(tile => !tile.innerHTML)) {
+      } else if (gameOver == "true" && rackTiles.every(tile => !tile.innerHTML)) {
         App.game.finalize_game(false, false, false);
       } else {
         if (letters) {
-          this.populateRack(letters.split(""));
+          populateRack(letters.split(""));
         }
 
-        this.messagesArea.children[6].textContent = 'Letters in Bag: ' + letRemaining;
+        messagesArea.children[6].textContent = 'Letters in Bag: ' + letRemaining;
 
-        this.canChallenge = true;
+        canChallenge = true;
 
-        if (this.isChallenged) {
-          this.isChallenged = false;
+        if (isChallenged) {
+          isChallenged = false;
           App.game.printMessage("A challenge against you failed! Your turn...");
-        } else if (this.myTurn) {
+        } else if (myTurn) {
           App.game.printMessage("Your turn...");
-        } else if (this.challenging) {
-          this.challenging = false;
+        } else if (challenging) {
+          challenging = false;
           App.game.printMessage("Challenge failed! Opponent's turn...");
         } else {
           App.game.printMessage("Opponent's turn...");
@@ -229,83 +271,108 @@ let Game = function() {
     }
   }
 
-  this.updateScore = function(score) {
-    if (this.challenging) {
-      this.challenging = false;
+  let updateScore = score => {
+    if (challenging) {
+      challenging = false;
       App.game.printMessage("Challenge successful! Your turn...");
     }
 
-    pElems = this.messagesArea.children;
+    pElems = messagesArea.children;
 
-    pElems[0].textContent = 'You: ' + this.totalScore;
-    pElems[2].textContent = this.opponentName + ': ' + score;
-    this.opponentScore = score;
+    pElems[0].textContent = 'You: ' + totalScore;
+    pElems[2].textContent = opponentName + ': ' + score;
+    opponentScore = score;
   }
 
-  this.cancelGame = function() {
+  let cancelGame = () => {
     App.game.printMessage("The game has been forfeited by the opponent. You are the winner.");
-    this.deactivateBoardAndButtons();
-    App.game.register_scores(this.totalScore, true);
+    deactivateBoardAndButtons();
+    App.game.register_scores(totalScore, true);
   }
 
-  this.finishGame = function(passEnding, pointsLimit, timeLimit) {
+  let finishGame = (passEnding, ptsLimit, tLimit) => {
     // This is to prevent duplicate execution
-    if (!this.finalChallengeAlreadyDone) {
+    if (!finalChallengeAlreadyDone) {
       if (passEnding) {
-        this.deductPoints(pointsLimit);
-      } else if (this.challengable && !timeLimit) {
-        if (this.myTurn) {
+        deductPoints(ptsLimit);
+      } else if (challengable && !tLimit) {
+        if (myTurn) {
           if (confirm("The game is about to end. Would you like to challenge the last word?")) {
             App.game.challenge(true);
           } else {
-            this.deductPoints(pointsLimit);
+            deductPoints(ptsLimit);
           }
         } else {
           App.game.printMessage("Waiting to see if your opponent will challenge your last word...");
         }
       } else {
-        this.deductPoints(pointsLimit);
+        deductPoints(ptsLimit);
       }
 
-      this.finalChallengeAlreadyDone = true;
+      finalChallengeAlreadyDone = true;
     }
   }
 
-  this.theEnd = function() {
-    this.myTurn = false;
-    this.started = false;
+  let theEnd = () => {
+    myTurn = false;
+    started = false;
 
-    this.deactivateBoardAndButtons();
+    deactivateBoardAndButtons();
 
     let winner = null;
 
-    if (this.pointsLimit && this.pointsLimit <= this.totalScore || this.pointsLimit <= this.opponentScore) {
-      if (this.opponentScore >= this.pointsLimit) {
+    if (pointsLimit && pointsLimit <= totalScore || pointsLimit <= opponentScore) {
+      if (opponentScore >= pointsLimit) {
         winner = false;
-        App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + this.opponentScore + " points!");
-      } else if ( this.totalScore >= this.pointsLimit) {
+        App.game.printMessage("Points Limit has been reached! Your opponent has won the game by " + opponentScore + " points!");
+      } else if ( totalScore >= pointsLimit) {
         winner = true;
-        App.game.printMessage("Points Limit has been reached! You have won the game by " + this.totalScore + " points!");
+        App.game.printMessage("Points Limit has been reached! You have won the game by " + totalScore + " points!");
       }
-    } else if (this.totalScore > this.opponentScore) {
+    } else if (totalScore > opponentScore) {
       winner = true;
-      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, you won with " + this.totalScore + " points!");
-    } else if (this.totalScore < this.opponentScore) {
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, you won with " + totalScore + " points!");
+    } else if (totalScore < opponentScore) {
       winner = false;
-      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, your opponent won with " + this.opponentScore + " points!");
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, your opponent won with " + opponentScore + " points!");
     } else {
-      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, it is a tie with " + this.totalScore + " points!");
+      App.game.printMessage("Game is over! After points deducted for remaining letters on your racks, it is a tie with " + totalScore + " points!");
     }
 
-    App.game.register_scores(this.totalScore, winner);
+    App.game.register_scores(totalScore, winner);
   }
+
+  let getPlayerId = () => {
+    return playerId;
+  }
+
+  let getOpponentId = () => {
+    return opponentId;
+  }
+
+  let publicAPI = {init, 
+                   setOpponent, 
+                   writeToChat, 
+                   placeTile,
+                   removeTile,
+                   processValidWords,
+                   processInvalidWords,
+                   challenge,
+                   passLetters,
+                   switchTurn,
+                   updateScore,
+                   cancelGame,
+                   finishGame,
+                   theEnd,
+                   getOpponentId,
+                   getPlayerId}
 
   /************************************************************
   /* START -> Methods to get the game layout and events ready *
   /************************************************************/
 
-  this.prepareBoard = function() {
-    if (!this.gameIsReady) {
+  let prepareBoard = () => {
+    if (!gameIsReady) {
       let board = document.getElementById('board');
 
       for (let i = 1; i <= 15; i++) {
@@ -313,7 +380,7 @@ let Game = function() {
           let tile = document.createElement('div');
           tile.id = String.fromCharCode(j) + i;
           tile.className = 'tile';
-          this.determineTileBackground(tile);
+          determineTileBackground(tile);
 
           tile.addEventListener('contextmenu', event => {
             let target = event.target;
@@ -323,65 +390,65 @@ let Game = function() {
               target = event.target.parentNode;
             }
 
-            if (target.innerHTML && target.draggable && this.opponentId) {
+            if (target.innerHTML && target.draggable && opponentId) {
               // Prevent context menu to pop up
               event.preventDefault();
 
               // Find the first empty spot in rack
-              let rackTile = this.rackTiles.filter((tile) => tile.innerHTML === '')[0];
+              let rackTile = rackTiles.filter((tile) => tile.innerHTML === '')[0];
 
               rackTile.innerHTML = target.innerHTML;
               target.innerHTML = '';
-              this.determineTileBackground(rackTile);
-              this.determineTileBackground(target);
+              determineTileBackground(rackTile);
+              determineTileBackground(target);
             }
           });
 
-          this.addDefaultHandlers(tile);
+          addDefaultHandlers(tile);
           board.appendChild(tile);
         }
       }
     }
   }
 
-  this.prepareRack = function() {
-    if (!this.gameIsReady) {
+  let prepareRack = () => {
+    if (!gameIsReady) {
       let rack = document.getElementById('rack');
 
       for (let i = 0; i < 7; i++) {
         let rackTile = document.createElement('div');
         rackTile.className = 'rack-tile';
-        this.addDefaultHandlers(rackTile);
-        this.rackTiles.push(rackTile);
+        addDefaultHandlers(rackTile);
+        rackTiles.push(rackTile);
         rack.appendChild(rackTile);
       }
     }
   }
 
-  this.addButtonHandlers = function() {
-    if (!this.gameIsReady) {
+  let addButtonHandlers = () => {
+    if (!gameIsReady) {
       let submitButton = document.getElementById('submit');
       submitButton.addEventListener('click', event => {
-        if (this.myTurn && this.opponentId) {
-          this.setWildTileAndSubmit();
+        if (myTurn && opponentId) {
+          setWildTileAndSubmit();
         }
       });
 
       let passButton = document.getElementById('pass');
       passButton.addEventListener('click', event => {
-        if (this.myTurn && this.opponentId) {
-          this.showDialogue("Enter letters to change: ", null);
+        if (myTurn && opponentId) {
+          showDialogue("Enter letters to change: ", null);
         }
       });
 
-      if (this.challengable) {
+      if (challengable) {
         let challengeButton = document.getElementById("challenge");
         challengeButton.addEventListener('click', event => {
-          if (this.myTurn && !this.isFirstMove && this.canChallenge && this.opponentId) {
-            this.removeTilesFromBoard();
+          if (myTurn && !isFirstMove && canChallenge && opponentId) {
+            removeTilesFromBoard();
 
-            this.challenging = true;
-            this.canChallenge = false;
+            challenging = true;
+            canChallenge = false;
             App.game.challenge(false);
           }
         })
@@ -392,8 +459,8 @@ let Game = function() {
         let tiles = [];
 
         // Get tiles from tile nodes
-        for (let i = 0; i < this.rackTiles.length; i++) {
-          tiles.push(this.rackTiles[i].innerHTML)
+        for (let i = 0; i < rackTiles.length; i++) {
+          tiles.push(rackTiles[i].innerHTML)
         }
 
         // Durstenfeld shuffle algorithm to randomize letters.
@@ -403,48 +470,48 @@ let Game = function() {
         }
 
         // Place letter values to tile nodes
-        for (let i = 0; i < this.rackTiles.length; i++) {
-          this.rackTiles[i].innerHTML = tiles[i];
-          this.determineTileBackground(this.rackTiles[i]);
+        for (let i = 0; i < rackTiles.length; i++) {
+          rackTiles[i].innerHTML = tiles[i];
+          determineTileBackground(rackTiles[i]);
         }
       });
 
       let forfeitButton = document.getElementById('forfeit');
       forfeitButton.addEventListener('click', event => {
-        if (this.started) {
+        if (started) {
           if (confirm("Are you sure to forfeit the game? 50 points will be deducted from your overall score.")) {
-            this.forfeit();
+            forfeit();
           }
         }
       });
     }
   }
 
-  this.prepareInfoArea = function() {
-    if (!this.gameIsReady) {
-      this.messagesArea = document.getElementById('messages-area');
+  let prepareInfoArea = () => {
+    if (!gameIsReady) {
+      messagesArea = document.getElementById('messages-area');
 
-      this.messagesArea.innerHTML = '<p class="float-left">You: 0</p><span id="clock"></span><p class="float-right">' + (this.opponentName || 'Opponent') + ': 0</p><hr class="clear"><p id="message" class="mt-4"></p><hr><p class="my-0">Letters in Bag: 86</p>';
+      messagesArea.innerHTML = '<p class="float-left">You: 0</p><span id="clock"></span><p class="float-right">' + (opponentName || 'Opponent') + ': 0</p><hr class="clear"><p id="message" class="mt-4"></p><hr><p class="my-0">Letters in Bag: 86</p>';
 
-      if (this.pointsLimit > 0) {
-        this.messagesArea.innerHTML += "<p class='my-0'>Points Limit is set to " + this.pointsLimit + ".</p>";
+      if (pointsLimit > 0) {
+        messagesArea.innerHTML += "<p class='my-0'>Points Limit is set to " + pointsLimit + ".</p>";
       }
     }
   }
 
-  this.prepareChat = function() {
-    if (!this.gameIsReady) {
-      this.chatArea = document.getElementById("chat");
+  let prepareChat = () => {
+    if (!gameIsReady) {
+      chatArea = document.getElementById("chat");
 
       chatInput = document.getElementById("chat-input");
 
       chatInput.addEventListener("keypress", event => {
         if (event.key == "Enter") {
-          if (this.opponentId) {
-            if (this.chatArea.value == "") {
-              this.chatArea.value = "Me: " + chatInput.value;
+          if (opponentId) {
+            if (chatArea.value == "") {
+              chatArea.value = "Me: " + chatInput.value;
             } else {
-              this.chatArea.value += '\n' + "Me: " + chatInput.value;
+              chatArea.value += '\n' + "Me: " + chatInput.value;
             }
 
             App.game.transmitChat(chatInput.value.replace(/[ ]/g, '•'));
@@ -456,17 +523,17 @@ let Game = function() {
     }
   }
 
-  this.startCountdown = function() {
-    if (!this.gameIsReady) {
+  let startCountdown = () => {
+    if (!gameIsReady) {
       let tickTock = setInterval(() => {
-        let minutes = Math.floor(this.timeLimit / 60);
-        let seconds = Math.floor(this.timeLimit % 60);
+        let minutes = Math.floor(timeLimit / 60);
+        let seconds = Math.floor(timeLimit % 60);
 
-        this.timeLimit -= 1;
+        timeLimit -= 1;
 
         document.getElementById("clock").innerHTML = minutes + "m " + seconds + "s ";
 
-        if (this.timeLimit < 0) {
+        if (timeLimit < 0) {
           document.getElementById("clock").innerHTML = "TIME'S UP";
 
           App.game.finalize_game(false, false, true);
@@ -477,23 +544,23 @@ let Game = function() {
     }
   }
 
-  this.addDefaultHandlers = function(elem) {
+  let addDefaultHandlers = elem => {
     elem.draggable = true;
 
     elem.addEventListener('dragstart', event => {
       if (event.target.innerHTML) {
         event.dataTransfer.setData('text/html', event.target.innerHTML);
-        this.draggedTile = event.target;
+        draggedTile = event.target;
 
-        if (event.target.className != "rack-tile" && this.myTurn && this.opponentId) {
+        if (event.target.className != "rack-tile" && myTurn && opponentId) {
           App.game.remove_tile(event.target.id);
         }
       }
     });
 
     elem.addEventListener('dragend', event => {
-      this.determineTileBackground(event.target);
-      this.draggedTile = null;
+      determineTileBackground(event.target);
+      draggedTile = null;
     });
 
     elem.addEventListener('click', event => {
@@ -504,15 +571,15 @@ let Game = function() {
         target = event.target.parentNode;
       }
 
-      if (target.draggable && (this.myTurn || target.className == "rack-tile") && this.opponentId) {
+      if (target.draggable && (myTurn || target.className == "rack-tile") && opponentId) {
         if (target.innerHTML !== '') {
           // Both board tile and clicked tile are occupied
           // This is the click to place the letter with swapping
-          if (this.tileClicked !== '') {
-            [target.innerHTML, this.tileClicked] = [this.tileClicked, target.innerHTML];
-            this.addTileToWord(target)
+          if (tileClicked !== '') {
+            [target.innerHTML, tileClicked] = [tileClicked, target.innerHTML];
+            addTileToWord(target)
 
-            if (target.className != "rack-tile" && this.myTurn) {
+            if (target.className != "rack-tile" && myTurn) {
               let letter = target.getElementsByTagName("SPAN")[0].textContent;
 
               App.game.remove_tile(target.id);
@@ -521,23 +588,23 @@ let Game = function() {
           } 
           // This is the click to grab the letter
           else {
-            this.tileClicked = target.innerHTML;
+            tileClicked = target.innerHTML;
             target.innerHTML = '';
-            this.determineTileBackground(target);
+            determineTileBackground(target);
 
-            if (target.className != "rack-tile" && this.myTurn) {
+            if (target.className != "rack-tile" && myTurn) {
               App.game.remove_tile(target.id);
             }
           }
         } else {
           // This is the click to place the letter without swapping
-          if (this.tileClicked !== '') {
-            target.innerHTML = this.tileClicked;
-            this.tileClicked = '';
-            this.determineTileBackground(target);
-            this.addTileToWord(target);
+          if (tileClicked !== '') {
+            target.innerHTML = tileClicked;
+            tileClicked = '';
+            determineTileBackground(target);
+            addTileToWord(target);
 
-            if (target.className != "rack-tile" && this.myTurn) {
+            if (target.className != "rack-tile" && myTurn) {
               let letter = target.getElementsByTagName("SPAN")[0].textContent;
 
               App.game.make_move(target.id + " " + (letter == " " ? "." : letter));
@@ -561,12 +628,12 @@ let Game = function() {
         target = event.target.parentNode;
       }
 
-      if (this.draggedTile && target.draggable && (this.myTurn || target.className == 'rack-tile')  && this.opponentId) {
-        this.draggedTile.innerHTML = target.innerHTML;
+      if (draggedTile && target.draggable && (myTurn || target.className == 'rack-tile')  && opponentId) {
+        draggedTile.innerHTML = target.innerHTML;
         target.innerHTML = event.dataTransfer.getData('text/html');
 
-        this.determineTileBackground(target);
-        this.addTileToWord(target);
+        determineTileBackground(target);
+        addTileToWord(target);
 
         if (target.className != 'rack-tile') {
           let letter = target.getElementsByTagName("SPAN")[0].textContent;
@@ -584,7 +651,7 @@ let Game = function() {
   /******************************************************/
 
   // See if the tiles placed are only sideways or only downwards
-  this.isConsecutive = function(ids) {
+  let isConsecutive = ids => {
     for (let i = 0; i < ids.length; i++) {
       if (ids[i + 1]) {
         // Word is towards right. Ids are strings
@@ -606,18 +673,18 @@ let Game = function() {
   }
 
   // See if there are spots without tiles in the words placed on board
-  this.hasNoGaps = function() {
-    let inBetweenTiles = this.getInBetweenTiles();
+  let hasNoGaps = () => {
+    let inBetweenTiles = getInBetweenTiles();
 
     return !inBetweenTiles.length || inBetweenTiles.every(id => document.getElementById(id).innerHTML);
   }
 
   // See if a word is adjacent to another word
-  this.isAdjacent = function() {
-    let wordTilesIds = this.wordTiles.map(tile => tile.id);
+  let isAdjacent = () => {
+    let wordTilesIds = wordTiles.map(tile => tile.id);
 
     let isOccupiedRight = tile => {
-      if (this.extractLetter(tile) == "o") {
+      if (extractLetter(tile) == "o") {
         return false;
       } else {
         let id = String.fromCharCode(tile.id.charCodeAt(0) + 1) + tile.id.slice(1);
@@ -626,7 +693,7 @@ let Game = function() {
     }
 
     let isOccupiedLeft = tile => {
-      if (this.extractLetter(tile) == "a") {
+      if (extractLetter(tile) == "a") {
         return false;
       } else {
         let id = String.fromCharCode(tile.id.charCodeAt(0) - 1) + tile.id.slice(1);
@@ -635,7 +702,7 @@ let Game = function() {
     }
     
     let isOccupiedUp = tile => {
-      let numberPart = this.extractNumber(tile);
+      let numberPart = extractNumber(tile);
 
       if (numberPart == 1) {
         return false;
@@ -646,7 +713,7 @@ let Game = function() {
     }
 
     let isOccupiedDown = tile => {
-      let numberPart = this.extractNumber(tile);
+      let numberPart = extractNumber(tile);
 
       if (numberPart == 15) {
         return false;
@@ -656,76 +723,76 @@ let Game = function() {
       }
     }
 
-    return this.wordTiles.some(tile => tile.id === 'h8' || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && this.hasNoGaps()));
+    return wordTiles.some(tile => tile.id === 'h8' || ((isOccupiedUp(tile) || isOccupiedDown(tile) || isOccupiedLeft(tile) || isOccupiedRight(tile)) && hasNoGaps()));
   }
 
-  this.isValidPlacement = function() {
-    return ((this.wordTiles.some(tile => tile.id === 'h8') && this.wordTiles.length > 1) || this.isContinuation()) && ((this.isValidToRight() && !this.isValidDownwards()) || (this.isValidDownwards() && !this.isValidToRight()) || this.wordTiles.length === 1);
+  let isValidPlacement = () => {
+    return ((wordTiles.some(tile => tile.id === 'h8') && wordTiles.length > 1) || isContinuation()) && ((isValidToRight() && !isValidDownwards()) || (isValidDownwards() && !isValidToRight()) || wordTiles.length === 1);
   }
 
-  this.isContinuation = function() {
-    let placedIds = this.wordTiles.map(tile => tile.id);
+  let isContinuation = () => {
+    let placedIds = wordTiles.map(tile => tile.id);
 
     // By collecting tiles and filtering out the tiles placed by the player, we can see if it is a continuation.
-    down = this.wordTiles.some(tile => this.collectWordTiles(this.extractNumber(tile), this.extractLetter(tile), true).filter(id => !placedIds.includes(id)).length);
-    side = this.wordTiles.some(tile => this.collectWordTiles(this.extractLetter(tile), this.extractNumber(tile), false).filter(id => !placedIds.includes(id)).length);
+    down = wordTiles.some(tile => collectWordTiles(extractNumber(tile), extractLetter(tile), true).filter(id => !placedIds.includes(id)).length);
+    side = wordTiles.some(tile => collectWordTiles(extractLetter(tile), extractNumber(tile), false).filter(id => !placedIds.includes(id)).length);
 
     return down || side;
   }
 
-  this.isValidToRight = function() {
-    let checkLetter = this.extractLetter(this.wordTiles[0]);
-    let checkNumber = this.extractNumber(this.wordTiles[0]);
+  let isValidToRight = () => {
+    let checkLetter = extractLetter(wordTiles[0]);
+    let checkNumber = extractNumber(wordTiles[0]);
 
     // If the word is towards right, the number parts of the ids are the same
     let isValid = tile => {
-      return this.extractLetter(tile) !== checkLetter && this.extractNumber(tile) === checkNumber;
+      return extractLetter(tile) !== checkLetter && extractNumber(tile) === checkNumber;
     }
 
-    return this.wordTiles.slice(1).every(isValid);
+    return wordTiles.slice(1).every(isValid);
   }
 
-  this.isValidDownwards = function() {
-    let checkLetter = this.extractLetter(this.wordTiles[0]);
-    let checkNumber = this.extractNumber(this.wordTiles[0]);
+  let isValidDownwards = () => {
+    let checkLetter = extractLetter(wordTiles[0]);
+    let checkNumber = extractNumber(wordTiles[0]);
 
     // If the word is towards right, the letter parts of the ids are the same
     let isValid = tile => {
-      return this.extractLetter(tile) === checkLetter && this.extractNumber(tile) !== checkNumber;
+      return extractLetter(tile) === checkLetter && extractNumber(tile) !== checkNumber;
     }
 
-    return this.wordTiles.slice(1).every(isValid);
+    return wordTiles.slice(1).every(isValid);
   }
 
-  this.isDownwards = function() {
-    return this.wordTiles.length > 1 && this.extractLetter(this.wordTiles[0]) === this.extractLetter(this.wordTiles[1]);
+  let isDownwards = () => {
+    return wordTiles.length > 1 && extractLetter(wordTiles[0]) === extractLetter(wordTiles[1]);
   }
 
   /***********************************
   /* START -> Methods to build words *
   /***********************************/
 
-  this.setWildTileAndSubmit = function() {
-    this.cleanWordTiles();
+  let setWildTileAndSubmit = () => {
+    cleanWordTiles();
 
-    let wild = this.wordTiles.filter(tile => tile.getElementsByTagName('span')[0].textContent === " ")[0];
+    let wild = wordTiles.filter(tile => tile.getElementsByTagName('span')[0].textContent === " ")[0];
 
     if (wild) {
-      this.showDialogue("Enter a letter: ", wild);
+      showDialogue("Enter a letter: ", wild);
     } else {
-      this.submit();
+      submit();
     }
   }
 
-  this.submit = () => {
-    if (this.isValidPlacement()) {
-      this.word = this.produceWord();
-      console.log(this.word);
+  let submit = () => {
+    if (isValidPlacement()) {
+      word = produceWord();
+      console.log(word);
 
-      if (this.challengable) {
-        this.processValidWords();
+      if (challengable) {
+        processValidWords();
       } else {
-        let wordsAsString = this.words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+        let wordsAsString = words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
         App.game.validate_words(wordsAsString);
       }
 
@@ -734,62 +801,62 @@ let Game = function() {
     }
   }
 
-  this.addTileToWord = function(tile) {
+  let addTileToWord = tile => {
     if (tile.className !== 'rack-tile') {
-      this.wordTiles.push(tile)
+      wordTiles.push(tile)
     }
   }
 
-  this.cleanWordTiles = function() {
+  let cleanWordTiles = () => {
     let cleaned = []
 
     // Remove duplicate and empty tile nodes
-    for (let i = 0; i < this.wordTiles.length; i++) {
-      if (!cleaned.includes(this.wordTiles[i]) && this.wordTiles[i].innerHTML !== '') {
-        cleaned.push(this.wordTiles[i])
+    for (let i = 0; i < wordTiles.length; i++) {
+      if (!cleaned.includes(wordTiles[i]) && wordTiles[i].innerHTML !== '') {
+        cleaned.push(wordTiles[i])
       }
     }
 
-    cleaned.sort(this.idSort);
+    cleaned.sort(sortById);
 
-    this.wordTiles = cleaned;
+    wordTiles = cleaned;
   }
 
-  this.produceWord = function() {
-    if (this.isDownwards()) {
-      return this.isAdjacent() && this.produceDownwards();
+  let produceWord = () => {
+    if (isDownwards()) {
+      return isAdjacent() && produceDownwards();
     } else {
-      return this.isAdjacent() && this.produceSideways();
+      return isAdjacent() && produceSideways();
     }
   }
 
-  this.produceDownwards = function() {
-    let pre = this.extractLetter(this.wordTiles[0]);
+  let produceDownwards = () => {
+    let pre = extractLetter(wordTiles[0]);
 
     // A small arrow function argument to 'sort' method because it sorts according to unicode values
     // a - b because sort needs -1, 0, 1 to perform sorting
-    let sortedIds = this.wordTiles.map(tile => this.extractNumber(tile)).sort((a, b) => a - b);
+    let sortedIds = wordTiles.map(tile => extractNumber(tile)).sort((a, b) => a - b);
 
-    let gatheredIds = this.collectWordTiles(sortedIds[0], pre, true);
+    let gatheredIds = collectWordTiles(sortedIds[0], pre, true);
 
     // If the node with the last id in sortedIds isn't in the list gatheredIds, an illegal move was made
     if (gatheredIds.indexOf(pre + sortedIds[sortedIds.length - 1]) === -1) {
       return false;
     }
 
-    // Because this.isConsecutive expects numbers as ids for downwards this.words
-    sortedIds = gatheredIds.map(id => this.extractNumber(id));
+    // Because isConsecutive expects numbers as ids for downwards words
+    sortedIds = gatheredIds.map(id => extractNumber(id));
 
-    for (let i = 0; i < this.wordTiles.length; i++) {
-      let word = this.collectWordSideways(this.wordTiles[i]);
+    for (let i = 0; i < wordTiles.length; i++) {
+      let word = collectWordSideways(wordTiles[i]);
 
       if (word) {
-        this.words.push(word);
+        words.push(word);
       }
     }
 
     // Necessary for calculating points for adding the final main word
-    this.words.push([]);
+    words.push([]);
 
     // Construct the ids again with letter value
     let fullIds = sortedIds.map(id => pre + id.toString());
@@ -799,32 +866,32 @@ let Game = function() {
     for (let i = 0; i < fullIds.length; i++) {
       let node = document.getElementById(fullIds[i]);
 
-      this.words[this.words.length - 1].push(node);
+      words[words.length - 1].push(node);
 
       sortedWord.push(node.getElementsByTagName('span')[0].textContent);
     }
 
-    return this.isConsecutive(sortedIds) && sortedWord.join('');
+    return isConsecutive(sortedIds) && sortedWord.join('');
   }
 
-  this.produceSideways = function() {
-    let post = this.extractNumber(this.wordTiles[0]);
+  let produceSideways = () => {
+    let post = extractNumber(wordTiles[0]);
 
     // Unicode sort is ok because numeric parts are the same for the rows
-    let sortedIds = this.wordTiles.map(tile => tile.id).sort();
+    let sortedIds = wordTiles.map(tile => tile.id).sort();
 
-    let gatheredIds = this.collectWordTiles(sortedIds[0][0], post);
+    let gatheredIds = collectWordTiles(sortedIds[0][0], post);
 
     // If the node with the last id in sortedIds isn't in the list gatheredIds, an illegal move was made
     if (gatheredIds.indexOf(sortedIds[sortedIds.length - 1]) === -1) {
       return false;
     }
 
-    for (let i = 0; i < this.wordTiles.length; i++) {
-      let word = this.collectWordDownwards(this.wordTiles[i]);
+    for (let i = 0; i < wordTiles.length; i++) {
+      let word = collectWordDownwards(wordTiles[i]);
 
       if (word) {
-        this.words.push(word);
+        words.push(word);
       }
     }
 
@@ -834,23 +901,23 @@ let Game = function() {
     // If only one tile is placed, main word is a gathered word
     if (gatheredIds.length > 1) {
       // Necessary for calculating points for adding the final main word
-      this.words.push([]);
+      words.push([]);
 
       for (let i = 0; i < gatheredIds.length; i++) {
         let node = document.getElementById(gatheredIds[i]);
         
-        this.words[this.words.length - 1].push(node);
+        words[words.length - 1].push(node);
 
         sortedWord.push(node.getElementsByTagName('span')[0].textContent);
       }
     } else {
-      sortedWord = this.words[this.words.length - 1]
+      sortedWord = words[words.length - 1]
     }
 
-    return this.isConsecutive(gatheredIds) && sortedWord.join('');
+    return isConsecutive(gatheredIds) && sortedWord.join('');
   }
 
-  this.showDialogue = function(message, wT) {
+  let showDialogue = (message, wT) => {
     let outerDiv = document.getElementById("outer-div");
     let p = document.getElementById("dialogue-text");
     let input = document.getElementById("dialogue-input");
@@ -880,19 +947,19 @@ let Game = function() {
 
         input.value = "";
 
-        this.submit();
+        submit();
       } else if (!wT && lettersToPass) {
         outerDiv.classList.add("d-none")
 
         input.value = "";
 
-        this.pass(lettersToPass.split(""));
+        pass(lettersToPass.split(""));
       }
     });
   }
 
-  this.pass = lettersToPass => {
-    let lettersOnRack = this.rackTiles.map(rackTile => rackTile.textContent[0]);
+  let pass = lettersToPass => {
+    let lettersOnRack = rackTiles.map(rackTile => rackTile.textContent[0]);
 
     // Remove redundant letters 
     for (let i = 0; i < lettersToPass.length; i++) {
@@ -906,15 +973,15 @@ let Game = function() {
     lettersToPass = lettersToPass.filter(letter => letter);
 
     if (lettersToPass.length) {
-      this.passedLetters = lettersToPass;
+      passedLetters = lettersToPass;
 
-      this.removeTilesFromBoard();
+      removeTilesFromBoard();
 
       App.game.pass_letters(lettersToPass);
     }
   }
 
-  this.collectWordTiles = function(start, affix, downwards=false) {
+  let collectWordTiles = (start, affix, downwards=false) => {
     let tiles = [];
     let node = null;
 
@@ -960,7 +1027,7 @@ let Game = function() {
     return tiles;
   }
 
-  this.collectWordSideways = function(tile) {
+  let collectWordSideways = tile => {
     let word = [tile];
 
     let collectToRight = tile => {
@@ -995,11 +1062,11 @@ let Game = function() {
     }
   }
 
-  this.collectWordDownwards = function(tile) {
+  let collectWordDownwards = tile => {
     let word = [tile];
 
     let collectUpwards = tile => {
-      let id = tile.id[0] + (this.extractNumber(tile) - 1);
+      let id = tile.id[0] + (extractNumber(tile) - 1);
       let node = document.getElementById(id);
 
       while (node && node.innerHTML) {
@@ -1010,7 +1077,7 @@ let Game = function() {
     }
 
     let collectDownwards = tile => {
-      let id = tile.id[0] + (this.extractNumber(tile) + 1);
+      let id = tile.id[0] + (extractNumber(tile) + 1);
       let node = document.getElementById(id);
 
       while (node && node.innerHTML) {
@@ -1030,13 +1097,13 @@ let Game = function() {
     }
   }
 
-  this.getInBetweenTiles = function() {
-    let sortedWordTiles = this.wordTiles.sort(this.sortById);
+  let getInBetweenTiles = () => {
+    let sortedWordTiles = wordTiles.sort(sortById);
     let onBoard = [];
 
-    if (this.determineDirection() === "D") {
-      let idLetter = this.extractLetter(sortedWordTiles[0]);
-      let idNumbers = sortedWordTiles.map(tile => this.extractNumber(tile));
+    if (determineDirection() === "D") {
+      let idLetter = extractLetter(sortedWordTiles[0]);
+      let idNumbers = sortedWordTiles.map(tile => extractNumber(tile));
 
       for(let i = 0; i < idNumbers.length; i++) {
         let calculatedIdNumber = idNumbers[i] + 1;
@@ -1044,7 +1111,7 @@ let Game = function() {
         if (idNumbers[i + 1] && calculatedIdNumber != idNumbers[i + 1] && calculatedIdNumber < 15) {
           onBoard.push(idLetter + String(calculatedIdNumber));
 
-          let lastIdNumber = this.extractNumber(onBoard[onBoard.length - 1]);
+          let lastIdNumber = extractNumber(onBoard[onBoard.length - 1]);
 
           while(idNumbers[i + 1] != lastIdNumber + 1 && lastIdNumber + 1 < 15) {
             lastIdNumber = lastIdNumber + 1;
@@ -1053,8 +1120,8 @@ let Game = function() {
         }
       }
     } else {
-      let idLetters = sortedWordTiles.map(tile => this.extractLetter(tile));
-      let idNumber = this.extractNumber(sortedWordTiles[0]);
+      let idLetters = sortedWordTiles.map(tile => extractLetter(tile));
+      let idNumber = extractNumber(sortedWordTiles[0]);
 
       for(let i = 0; i < idLetters.length; i++) {
         let calculatedIdLetter = String.fromCharCode(idLetters[i].charCodeAt(0) + 1);
@@ -1075,8 +1142,8 @@ let Game = function() {
     return onBoard;
   }
 
-  this.determineDirection = function() {
-    let idLetters = this.wordTiles.map(tile => tile.id[0]);
+  let determineDirection = () => {
+    let idLetters = wordTiles.map(tile => tile.id[0]);
     let checkLetter = idLetters[0];
 
     if (idLetters.slice(1).every(idLetter => idLetter === checkLetter)) {
@@ -1086,25 +1153,24 @@ let Game = function() {
     }
   }
 
-  this.extractLetter = function(tile) {
+  let extractLetter = tile => {
     // First index of the id is a letter
     return tile.id[0];
   }
 
-  this.extractNumber = function(tileOrId) {
+  let extractNumber = tileOrId => {
     let id = tileOrId.id || tileOrId;
 
     // Get indeces except the first one (that is, the numeric part)
     return Number(id.split('').slice(1).join(''));
   }
 
-  // Arrow function syntax is used for a proper 'this'.
   // This function is only used with 'sort' Array method.
-  this.sortById = (t1, t2) => {
-    let t1Letter = this.extractLetter(t1);
-    let t1Number = this.extractNumber(t1);
-    let t2Letter = this.extractLetter(t2);
-    let t2Number = this.extractNumber(t2);
+  let sortById = (t1, t2) => {
+    let t1Letter = extractLetter(t1);
+    let t1Number = extractNumber(t1);
+    let t2Letter = extractLetter(t2);
+    let t2Number = extractNumber(t2);
 
     if (t1Letter == t2Letter) {
       if (t1Number < t2Number) {
@@ -1129,16 +1195,16 @@ let Game = function() {
   /* START -> Methods to control board and tiles *
   /***********************************************/
 
-  this.determineTileBackground = function(tile) {
+  let determineTileBackground = tile => {
     if (tile.innerHTML) {
       tile.style.backgroundColor = '#BE975B';
-    } else if (this.tripleWordBonus.includes(tile.id)) {
+    } else if (tripleWordBonus.includes(tile.id)) {
       tile.style.backgroundColor = '#ff3300';
-    } else if (this.doubleWordBonus.includes(tile.id)) {
+    } else if (doubleWordBonus.includes(tile.id)) {
       tile.style.backgroundColor = '#ff99cc';
-    } else if (this.tripleLetterBonus.includes(tile.id)) {
+    } else if (tripleLetterBonus.includes(tile.id)) {
       tile.style.backgroundColor = '#3366ff';
-    } else if (this.doubleLetterBonus.includes(tile.id)) {
+    } else if (doubleLetterBonus.includes(tile.id)) {
       tile.style.backgroundColor = '#b3c6ff';
     } else if (tile.className === 'rack-tile') {
       tile.style.backgroundColor = '#cccccc';
@@ -1147,70 +1213,70 @@ let Game = function() {
     }
   }
 
-  this.removeTilesFromBoard = function() {
-    for (let i = 0; i < this.rackTiles.length; i++) {
-      if (!this.rackTiles[i].innerHTML) {
-        let tileOnBoard = this.wordTiles.pop();
+  let removeTilesFromBoard = () => {
+    for (let i = 0; i < rackTiles.length; i++) {
+      if (!rackTiles[i].innerHTML) {
+        let tileOnBoard = wordTiles.pop();
 
-        this.rackTiles[i].innerHTML = tileOnBoard.innerHTML;
+        rackTiles[i].innerHTML = tileOnBoard.innerHTML;
         tileOnBoard.innerHTML = "";
-        this.determineTileBackground(this.rackTiles[i]);
-        this.determineTileBackground(tileOnBoard);
+        determineTileBackground(rackTiles[i]);
+        determineTileBackground(tileOnBoard);
 
         App.game.remove_tile(tileOnBoard.id);
       }
     }
 
-    this.wordTiles = [];
+    wordTiles = [];
   }
 
-  this.activateWordTiles = function() {
-    for (let i = 0; i < this.prevWordTiles.length; i++) {
-      this.prevWordTiles[i].draggable = true;
+  let activateWordTiles = () => {
+    for (let i = 0; i < prevWordTiles.length; i++) {
+      prevWordTiles[i].draggable = true;
     }
   }
 
-  this.deactivateWordTiles = function() {
-    for (let i = 0; i < this.wordTiles.length; i++) {
-      this.wordTiles[i].draggable = false;
+  let deactivateWordTiles = () => {
+    for (let i = 0; i < wordTiles.length; i++) {
+      wordTiles[i].draggable = false;
     }
   }
 
-  this.deactivateBoardAndButtons = function() {
+  let deactivateBoardAndButtons = () => {
     let tiles = document.getElementById("board").children;
 
     for (let i = 0; i < tiles.length; i++) {
       tiles[i].draggable = false;
     }
 
-    for (let i = 0; i < this.rackTiles.length; i++) {
-      this.rackTiles[i].draggable = false;
+    for (let i = 0; i < rackTiles.length; i++) {
+      rackTiles[i].draggable = false;
     }
 
-    this.started = false;
+    started = false;
   }
 
-  this.replaceRackTiles = function() {
+  let replaceRackTiles = () => {
     let replaceTile = (presentTile, prevTile) => {
-      this.presentTile.innerHTML = this.prevTile.innerHTML;
-      this.prevTile.innerHTML = "";
-      this.determineTileBackground(this.presentTile);
-      this.determineTileBackground(this.prevTile);
+      presentTile.innerHTML = prevTile.innerHTML;
+      prevTile.innerHTML = "";
+      determineTileBackground(presentTile);
+      determineTileBackground(prevTile);
 
-      App.game.remove_tile(this.prevTile.id);
+      App.game.remove_tile(prevTile.id);
     }
 
     // This method is called after a challenge is successful to return drawn letters to bag
-    if (this.rackTiles.every(rackTile => !rackTile.innerHTML)) {
+    if (rackTiles.every(rackTile => !rackTile.innerHTML)) {
       // If rack is completely empty, just put the placed tiles back on
-      for (let i = 0; i < this.prevWordTiles.length; i++) {
+      for (let i = 0; i < prevWordTiles.length; i++) {
         replaceTile(rackTiles[i], prevWordTiles[i]);
       }
     } else {
       // If not completely empty, then should check if replacing the correct letter
-      for (let i = 0; i < this.drawnTiles.length; i++) {
-        for (let j = 0; j < this.rackTiles.length; j++) {
-          if (this.drawnTiles[i] === this.rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
+      for (let i = 0; i < drawnTiles.length; i++) {
+        for (let j = 0; j < rackTiles.length; j++) {
+          if (drawnTiles[i] === rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
             replaceTile(rackTiles[i], prevWordTiles[i]);
 
             break;
@@ -1219,21 +1285,21 @@ let Game = function() {
       }
     }
 
-    App.game.return_back_letters(this.drawnTiles);
-  }
+    App.game.return_back_letters(drawnTiles);
+  }  
 
-  this.populateRack = function(tiles) {
-    this.drawnTiles = tiles.slice();
+  let populateRack = tiles => {
+    drawnTiles = tiles.slice();
 
-    for (let i = 0; i < this.rackTiles.length; i++) {
-      if (!this.rackTiles[i].innerHTML) {
+    for (let i = 0; i < rackTiles.length; i++) {
+      if (!rackTiles[i].innerHTML) {
         let tile = tiles.pop()
         
         if (tile) {
-          this.rackTiles[i].innerHTML = '<span></span><sub></sub>';
-          this.rackTiles[i].getElementsByTagName('span')[0].textContent = tile == "." ? " " : tile;
-          this.rackTiles[i].lastChild.textContent = this.letterPoints[tile];
-          this.determineTileBackground(this.rackTiles[i]);
+          rackTiles[i].innerHTML = '<span></span><sub></sub>';
+          rackTiles[i].getElementsByTagName('span')[0].textContent = tile == "." ? " " : tile;
+          rackTiles[i].lastChild.textContent = letterPoints[tile];
+          determineTileBackground(rackTiles[i]);
         }
       }
     }
@@ -1243,51 +1309,51 @@ let Game = function() {
   /* START -> Methods to determine points and score *
   /**************************************************/
 
-  this.calcPoints = function() {
+  let calcPoints = () => {
     let calcWordPoints = word => {
       let points = 0;
 
-      word.forEach(tile => points += this.calcLetterBonus(tile));
-      word.forEach(tile => points *= this.calcWordBonus(tile));
+      word.forEach(tile => points += calcLetterBonus(tile));
+      word.forEach(tile => points *= calcWordBonus(tile));
 
       return points;
     }
 
     // Additional 60 points if all the tiles in the rack are used
-    let points = this.rackTiles.some(tile => tile.innerHTML) ? 0 : 60;
+    let points = rackTiles.some(tile => tile.innerHTML) ? 0 : 60;
 
-    this.words.forEach(word => points += calcWordPoints(word));
+    words.forEach(word => points += calcWordPoints(word));
 
-    this.prevTurnScore = points;
+    prevTurnScore = points;
 
     return points;
   }
 
-  this.calcLetterBonus = function(tile) {
+  let calcLetterBonus = tile => {
     if (tile.getElementsByTagName('sub')[0].textContent != '0') {
       // Make sure the tile wasn't placed previously. Draggable means it is just placed.
       if (tile.draggable) {
-        if (this.doubleLetterBonus.includes(tile.id)) {
-          return this.letterPoints[tile.getElementsByTagName('span')[0].textContent] * 2;
-        } else if (this.tripleLetterBonus.includes(tile.id)) {
-          return this.letterPoints[tile.getElementsByTagName('span')[0].textContent] * 3;
+        if (doubleLetterBonus.includes(tile.id)) {
+          return letterPoints[tile.getElementsByTagName('span')[0].textContent] * 2;
+        } else if (tripleLetterBonus.includes(tile.id)) {
+          return letterPoints[tile.getElementsByTagName('span')[0].textContent] * 3;
         } else {
-          return this.letterPoints[tile.getElementsByTagName('span')[0].textContent];
+          return letterPoints[tile.getElementsByTagName('span')[0].textContent];
         }
       } else {
-        return this.letterPoints[tile.getElementsByTagName('span')[0].textContent];
+        return letterPoints[tile.getElementsByTagName('span')[0].textContent];
       }
     } else {
       return 0;
     }
   }
 
-  this.calcWordBonus = function(tile) {
+  let calcWordBonus = tile => {
     // Make sure the tile wasn't placed previously. Draggable means it is just placed. 
     if (tile.draggable) {
-      if (this.tripleWordBonus.includes(tile.id)) {
+      if (tripleWordBonus.includes(tile.id)) {
         return 3;
-      } else if (this.doubleWordBonus.includes(tile.id)) {
+      } else if (doubleWordBonus.includes(tile.id)) {
         return 2;
       } else {
         return 1;
@@ -1297,37 +1363,39 @@ let Game = function() {
     }
   }
 
-  this.deductPoints = function(pointsLimit) {
-    if (!pointsLimit) {
-      for (let i = 0; i < this.rackTiles.length; i++) {
-        if (this.rackTiles[i].innerHTML) {
-          pointsToBeDeducted = this.letterPoints[this.rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
-          this.deductedPoints += pointsToBeDeducted;
-          this.totalScore -= pointsToBeDeducted;
+  let deductPoints = ptsLimit => {
+    if (!ptsLimit) {
+      for (let i = 0; i < rackTiles.length; i++) {
+        if (rackTiles[i].innerHTML) {
+          pointsToBeDeducted = letterPoints[rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
+          deductedPoints += pointsToBeDeducted;
+          totalScore -= pointsToBeDeducted;
         }
       }
     }
 
-    App.game.printMessage('You: ' + this.totalScore);
-    App.game.deliver_score(this.totalScore, true);
+    App.game.printMessage('You: ' + totalScore);
+    App.game.deliver_score(totalScore, true);
   }
 
-  this.forfeit = function() {
-    App.game.forfeit(this.totalScore);
-    this.deactivateBoardAndButtons();
+  let forfeit = () => {
+    App.game.forfeit(totalScore);
+    deactivateBoardAndButtons();
     App.game.printMessage("You have forfeited the game. 50 points has been deducted from your overall score.");
   }
 
-  this.resetTurn = function() {
-    this.prevWordTiles = this.wordTiles;
-    this.prevWords = this.words;
-    this.wordTiles = [];
-    this.words = [];
+  let resetTurn = () => {
+    prevWordTiles = wordTiles.slice();
+    prevWords = words.slice();
+    wordTiles = [];
+    words = [];
 
-    if (this.isFirstMove) {
-      this.isFirstMove = false;
+    if (isFirstMove) {
+      isFirstMove = false;
     }
 
-    this.messagesArea.firstChild.textContent = 'You: ' + this.totalScore;
+    messagesArea.firstChild.textContent = 'You: ' + totalScore;
   }
+
+  return publicAPI;
 }

@@ -11,31 +11,31 @@ window.onload = () ->
         when "game_init"
           [playerId, playerName, rack, challengable, timeLimit, pointsLimit] = data.msg.split(" ")
 
-          App.gamePlay = new Game()
+          App.gamePlay = Game()
           App.gamePlay.init(playerId, rack.split(""), true, challengable == "true", timeLimit, pointsLimit)
           @printMessage("Waiting for opponent...")
 
         when "game_start"
           [opponentId, opponentName, rack, challengable, timeLimit, pointsLimit, playerId, playerName] = data.msg.split(' ')
 
-          if App.gamePlay && App.gamePlay.playerId == playerId && !App.gamePlay.opponentId
+          if App.gamePlay && App.gamePlay.getPlayerId() == playerId && !App.gamePlay.getOpponentId()
             App.gamePlay.setOpponent(opponentId, opponentName)
             @printMessage("Game has started! You play first.")
           else if !App.gamePlay
-            App.gamePlay = new Game()
+            App.gamePlay = Game()
             App.gamePlay.init(opponentId, rack.split(''), false, challengable == "true", timeLimit, pointsLimit, playerId, playerName)
             @printMessage("Game has started! You play second.")
 
         when "make_move"
           [tile, letter, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.placeTile(tile, letter)
 
         when "switch_turn"
           [rack, remaining, passes, rackEmpty, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.switchTurn(rack, remaining, 0, rackEmpty)
           else
             App.gamePlay.switchTurn("", remaining, passes, rackEmpty)
@@ -43,40 +43,40 @@ window.onload = () ->
         when "remove_tile"
           [tileId, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.removeTile(tileId)
 
         when "pass_letters"
           [letters, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.passLetters(letters)
 
         when "process_valid_words"
           [word, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.processValidWords()
 
         when "process_invalid_words"
           [word, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.processInvalidWords(word)
 
-          if App.gamePlay.playerId != playerId
+          if App.gamePlay.getPlayerId() != playerId
             @printMessage("Your turn...")
 
         when "challenge"
           [last, playerId] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.challenge(last == "true")
 
         when "deliver_score"
           [score, playerId, theEnd] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.updateScore(score)
 
           if theEnd == "true"
@@ -88,13 +88,13 @@ window.onload = () ->
           App.gamePlay.finishGame(passEnding == "true", pointsLimit == "true", timeLimit == "true");
 
         when "forfeit"
-          if App.gamePlay.playerId == data.msg
+          if App.gamePlay.getPlayerId() == data.msg
             App.gamePlay.cancelGame()
 
         when "transmit_chat"
           [playerId, message] = data.msg.split(" ")
 
-          if App.gamePlay.playerId == playerId
+          if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.writeToChat(message)
           
     printMessage: (message) ->
