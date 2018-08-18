@@ -68,7 +68,6 @@ let Game = function() {
       this.addButtonHandlers();
       this.prepareInfoArea();
       this.prepareChat();
-      this.addDialogueHandlers();
       this.populateRack(letters);
 
       if (this.timeLimit && this.opponentId) {
@@ -157,7 +156,7 @@ let Game = function() {
       this.activateWordTiles();
       this.replaceRackTiles();
 
-      this.messagesArea.firstChild.textContent = "You:" + this.totalScore;
+      this.messagesArea.firstChild.textContent = "You: " + this.totalScore;
 
       App.game.printMessage("You have been challenged! '" + word + "' is not a valid word!");
       App.game.deliver_score(this.totalScore, false);
@@ -441,15 +440,17 @@ let Game = function() {
 
       chatInput.addEventListener("keypress", event => {
         if (event.key == "Enter") {
-          if (this.chatArea.value == "") {
-            this.chatArea.value = "Me: " + chatInput.value;
+          if (this.opponentId) {
+            if (this.chatArea.value == "") {
+              this.chatArea.value = "Me: " + chatInput.value;
+            } else {
+              this.chatArea.value += '\n' + "Me: " + chatInput.value;
+            }
+
+            App.game.transmitChat(chatInput.value.replace(/[ ]/g, '•'));
           } else {
-            this.chatArea.value += '\n' + "Me: " + chatInput.value;
-          }
-
-          App.game.transmitChat(chatInput.value.replace(/[ ]/g, '•'));
-
-          chatInput.value = "";
+            chatInput.value = "";
+          } 
         }
       });
     }
@@ -576,39 +577,6 @@ let Game = function() {
         event.preventDefault();
       }
     });
-  }
-
-  this.addDialogueHandlers = function() {
-    if (!this.gameIsReady) {
-      let outerDiv = document.getElementById("outer-div");
-      let input = document.getElementById("dialogue-input");
-      let cancelButton = document.getElementById("dialogue-cancel");
-      let submitButton = document.getElementById("dialogue-submit");
-
-      cancelButton.addEventListener("click", event => {
-        outerDiv.classList.add("d-none")
-      });
-
-      submitButton.addEventListener("click", event => {
-        let wildLetterValue = input.value.toUpperCase().replace(/[^A-Z]/, '');
-        let lettersToPass = input.value.toUpperCase().replace(/[^A-Z ]/, '');
-
-        if (wT && wildLetterValue.length === 1) {
-          outerDiv.classList.add("d-none")
-
-          wT.getElementsByTagName("SPAN")[0].textContent = wildLetterValue;
-          wT.getElementsByTagName("SUB")[0].textContent = 0;
-
-          App.game.make_move(wT.id + " " + wildLetterValue + "*")
-
-          this.submit();
-        } else if (!wT && lettersToPass) {
-          outerDiv.classList.add("d-none")
-
-          this.pass(lettersToPass.split(""));
-        }
-      });
-    }
   }
 
   /******************************************************
@@ -885,10 +853,37 @@ let Game = function() {
   this.showDialogue = function(message, wT) {
     let outerDiv = document.getElementById("outer-div");
     let p = document.getElementById("dialogue-text");
+    let input = document.getElementById("dialogue-input");
+    let cancelButton = document.getElementById("dialogue-cancel");
+    let submitButton = document.getElementById("dialogue-submit");
 
     p.textContent = message;
 
     outerDiv.classList.remove("d-none");
+    
+    cancelButton.addEventListener("click", event => {
+      outerDiv.classList.add("d-none")
+    });
+
+    submitButton.addEventListener("click", event => {
+      let wildLetterValue = input.value.toUpperCase().replace(/[^A-Z]/, '');
+      let lettersToPass = input.value.toUpperCase().replace(/[^A-Z ]/, '');
+
+      if (wT && wildLetterValue.length === 1) {
+        outerDiv.classList.add("d-none")
+
+        wT.getElementsByTagName("SPAN")[0].textContent = wildLetterValue;
+        wT.getElementsByTagName("SUB")[0].textContent = 0;
+
+        App.game.make_move(wT.id + " " + wildLetterValue + "*")
+
+        this.submit();
+      } else if (!wT && lettersToPass) {
+        outerDiv.classList.add("d-none")
+
+        this.pass(lettersToPass.split(""));
+      }
+    });
   }
 
   this.pass = lettersToPass => {
@@ -1328,6 +1323,6 @@ let Game = function() {
       this.isFirstMove = false;
     }
 
-    this.messagesArea.firstChild.textContent = 'You:' + this.totalScore;
+    this.messagesArea.firstChild.textContent = 'You: ' + this.totalScore;
   }
 }
