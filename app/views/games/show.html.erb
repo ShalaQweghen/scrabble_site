@@ -17,6 +17,15 @@
   </div>
 </div>
 
+<div id="outer-div" class="d-none">
+  <div id="inner-div">
+    <p id="dialogue-text"></p>
+    <input type="text" name="dialogue-input" id="dialogue-input" class="d-block mx-auto mb-3" autofocus>
+    <button id="dialogue-cancel" class="btn btn-warning mr-2 btn-sm">CANCEL</button>
+    <button id="dialogue-submit" class="btn btn-primary btn-sm">SUBMIT</button>
+  </div>
+</div>
+
 <script type="text/javascript">
   if (window.location.href.match(/.*\?refresh=true$/)) {
     window.location.href = window.location.href.split("?")[0]
