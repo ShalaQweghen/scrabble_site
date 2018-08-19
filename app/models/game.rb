@@ -134,7 +134,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def self.forfeit(user, game, score)
+  def self.forfeit(user, game, score, windowClosed=false)
     opponent = opponent_for(user)
 
     game.toggle!(:forfeited)

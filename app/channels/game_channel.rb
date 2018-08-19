@@ -18,7 +18,7 @@ class GameChannel < ApplicationCable::Channel
     if @game.participant_id.nil?
       @game.delete
     elsif @game.participant_id && @game.part_score.nil? && @game.host_score.nil?
-      Game.forfeit(current_user, @game, { "score" => 0 })
+      Game.forfeit(current_user, @game, { "data" => 0 })
     end
   end
 
