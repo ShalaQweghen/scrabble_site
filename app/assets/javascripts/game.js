@@ -48,7 +48,7 @@ let Game = () => {
     if (!playerId) {
       playerId = pId;
       opponentId = opId;
-      opponentName = opName;
+      opponentName = opName ? opName.replace("-", " ") : opName;
 
       timeLimit = Number(tLimit);
       pointsLimit = Number(ptsLimit);
@@ -117,7 +117,7 @@ let Game = () => {
   let setOpponent = (opId, opName) => {
     if (!opponentId) {
       opponentId = opId;
-      opponentName = opName;
+      opponentName = opName.replace("-", " ");
       messagesArea.children[2].textContent = opponentName + ": 0";
       started = true;
 

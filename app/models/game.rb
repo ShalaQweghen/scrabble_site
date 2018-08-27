@@ -17,7 +17,10 @@ class Game < ApplicationRecord
 
     REDIS.set("game_bag_#{game.slug}", bag)
 
-    ActionCable.server.broadcast "game-#{game.slug}", { action: "game_init", msg: "#{game.host.id} #{game.host.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit}" }
+    # Prevent multi name bug
+    player_name = game.host.name.sub(" ", "-")
+
+    ActionCable.server.broadcast "game-#{game.slug}", { action: "game_init", msg: "#{game.host.id} #{player_name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit}" }
   end
 
   def self.start(game)
@@ -32,7 +35,10 @@ class Game < ApplicationRecord
     REDIS.set("opponent_for:#{game.participant.id}", game.host.id)
     REDIS.set("game_bag_#{game.slug}", bag)
 
-    ActionCable.server.broadcast "game-#{game.slug}", { action: "game_start", msg: "#{game.participant.id} #{game.participant.name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit} #{game.host.id} #{game.host.name}" }
+    # Prevent multi name bug
+    player_name = game.participant.name.sub(" ", "-")
+
+    ActionCable.server.broadcast "game-#{game.slug}", { action: "game_start", msg: "#{game.participant.id} #{player_name} #{rack} #{game.challengable} #{game.time_limit} #{game.points_limit} #{game.host.id} #{game.host.name}" }
   end
 
   def self.make_move(user, game_id, move)
