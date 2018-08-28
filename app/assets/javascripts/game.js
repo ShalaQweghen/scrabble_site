@@ -5,7 +5,9 @@ let Game = () => {
       timeLimit, 
       pointsLimit,
       tileClicked, 
-      draggedTile, 
+      draggedTile,
+      wildTile,
+      wildTile2, 
       rackTiles, 
       wordTiles, 
       word, 
@@ -55,6 +57,8 @@ let Game = () => {
 
       tileClicked = '';
       draggedTile = null;
+      wildTile = null;
+      wildTile2 = null;
 
       rackTiles = [];
 
@@ -94,7 +98,6 @@ let Game = () => {
       'JX'.split('').forEach(l => letterPoints[l] = 8);
       'QZ'.split('').forEach(l => letterPoints[l] = 10);
       letterPoints['K'] = 5;
-      letterPoints[' '] = 0;
 
       doubleLetterBonus = 'a4 a12 c7 c9 d1 d8 d15 g3 g7 g9 g13 h4 h12 o4 o12 m7 m9 l1 l8 l15 i3 i7 i9 i13'.split(' ');
       tripleLetterBonus = 'b6 b10 n6 n10 f2 f6 f10 f14 j2 j6 j10 j14'.split(' ');
@@ -144,13 +147,13 @@ let Game = () => {
     let tile = document.getElementById(id);
     tile.draggable = false;
     tile.innerHTML = '<span></span><sub></sub>';
-    tile.getElementsByTagName('span')[0].textContent = letter[0] == "." ? " " : letter[0];
+    setLetter(tile, letter[0] == "." ? " " : letter[0]);
     
     // If the letter to be placed is wild tile, length is two
     if (letter.length > 1) {
-      tile.getElementsByTagName("sub")[0].textContent = 0;
+      tile.lastChild.textContent = 0;
     } else {
-      tile.getElementsByTagName("sub")[0].textContent = letterPoints[letter[0]];
+      tile.lastChild.textContent = letterPoints[letter[0]];
     }
 
     determineTileBackground(tile);
@@ -209,7 +212,7 @@ let Game = () => {
     aboutToEnd = last;
     isChallenged = true;
 
-    let wordsAsString = prevWords.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+    let wordsAsString = prevWords.map(word => word.map(tile => getLetter(tile)).join("")).join(" ");
 
     App.game.validate_words(wordsAsString);
   }
@@ -221,8 +224,11 @@ let Game = () => {
 
     for (let i = 0; i < letters.length; i++) {
       let rackTile = rackTiles.find(tile => tile.textContent[0] === passedLetters[i]);
-      rackTile.getElementsByTagName('span')[0].textContent = letters[i];
-      rackTile.lastChild.textContent = letterPoints[letters[i]];
+      setLetter(rackTile, letters[i]);
+
+      if (letter != " ") {
+        rackTile.lastChild.textContent = letterPoints[letters[i]];
+      }
     }
 
     App.game.switch_turn(0, passes);
@@ -231,6 +237,10 @@ let Game = () => {
   let switchTurn = (letters, letRemaining, numPasses, gameOver) => {
     myTurn = !myTurn;
     finalChallengeAlreadyDone = false;
+
+    if (myTurn) {
+      wildTile = null;
+    }
 
     if (pointsLimit && (opponentScore >= pointsLimit || totalScore >= pointsLimit)) {
       App.game.finalize_game(false, true, false);
@@ -381,7 +391,7 @@ let Game = () => {
           let target = event.target;
 
           // Because of event capturing, this is necessary
-          if (['SPAN', 'SUB'].includes(event.target.nodeName)) {
+          if (["SPAN", 'SUB'].includes(event.target.nodeName)) {
             target = event.target.parentNode;
           }
 
@@ -392,8 +402,11 @@ let Game = () => {
             // Find the first empty spot in rack
             let rackTile = rackTiles.filter((tile) => tile.innerHTML === '')[0];
 
+            resetPlacedWildTile(target);
+
             rackTile.innerHTML = target.innerHTML;
             target.innerHTML = '';
+
             determineTileBackground(rackTile);
             determineTileBackground(target);
           }
@@ -549,7 +562,7 @@ let Game = () => {
       let target = event.target;
 
       // Because of event capturing, this is necessary
-      if (['SPAN', 'SUB'].includes(event.target.nodeName)) {
+      if (["SPAN", 'SUB'].includes(event.target.nodeName)) {
         target = event.target.parentNode;
       }
 
@@ -562,7 +575,7 @@ let Game = () => {
             addTileToWord(target)
 
             if (target.className != "rack-tile" && myTurn) {
-              let letter = target.getElementsByTagName("SPAN")[0].textContent;
+              let letter = getLetter(target);
 
               App.game.remove_tile(target.id);
               App.game.make_move(target.id + " " + (letter == " " ? "." : letter));
@@ -570,8 +583,11 @@ let Game = () => {
           } 
           // This is the click to grab the letter
           else {
+            resetPlacedWildTile(target);
+
             tileClicked = target.innerHTML;
             target.innerHTML = '';
+
             determineTileBackground(target);
 
             if (target.className != "rack-tile" && myTurn) {
@@ -587,7 +603,7 @@ let Game = () => {
             addTileToWord(target);
 
             if (target.className != "rack-tile" && myTurn) {
-              let letter = target.getElementsByTagName("SPAN")[0].textContent;
+              let letter = getLetter(target);
 
               App.game.make_move(target.id + " " + (letter == " " ? "." : letter));
             }
@@ -606,19 +622,21 @@ let Game = () => {
       let target = event.target;
 
       // Because of event capturing, this is necessary
-      if (['SPAN', 'SUB'].includes(event.target.nodeName)) {
+      if (["SPAN", 'SUB'].includes(event.target.nodeName)) {
         target = event.target.parentNode;
       }
 
       if (draggedTile && target.draggable && (myTurn || target.className == 'rack-tile')  && opponentId) {
         draggedTile.innerHTML = target.innerHTML;
+
         target.innerHTML = event.dataTransfer.getData('text/html');
 
+        resetPlacedWildTile(target);
         determineTileBackground(target);
         addTileToWord(target);
 
         if (target.className != 'rack-tile') {
-          let letter = target.getElementsByTagName("SPAN")[0].textContent;
+          let letter = getLetter(target);
 
           App.game.make_move(target.id + " " + (letter == " " ? "." : letter));
         }
@@ -757,9 +775,9 @@ let Game = () => {
   let setWildTileAndSubmit = () => {
     cleanWordTiles();
 
-    let wild = wordTiles.filter(tile => tile.getElementsByTagName('span')[0].textContent === " ")[0];
+    let wild = wordTiles.filter(tile => getLetter(tile) === " ");
 
-    if (wild) {
+    if (wild.length) {
       showDialogue("Enter a letter: ", wild);
     } else {
       submit();
@@ -773,7 +791,7 @@ let Game = () => {
       if (challengable) {
         processValidWords();
       } else {
-        let wordsAsString = words.map(word => word.map(tile => tile.getElementsByTagName("SPAN")[0].textContent).join("")).join(" ");
+        let wordsAsString = words.map(word => word.map(tile => getLetter(tile)).join("")).join(" ");
         App.game.validate_words(wordsAsString);
       }
 
@@ -849,7 +867,7 @@ let Game = () => {
 
       words[words.length - 1].push(node);
 
-      sortedWord.push(node.getElementsByTagName('span')[0].textContent);
+      sortedWord.push(getLetter(node));
     }
 
     return isConsecutive(sortedIds) && sortedWord.join('');
@@ -889,7 +907,7 @@ let Game = () => {
         
         words[words.length - 1].push(node);
 
-        sortedWord.push(node.getElementsByTagName('span')[0].textContent);
+        sortedWord.push(getLetter(node));
       }
     } else {
       sortedWord = words[words.length - 1]
@@ -904,6 +922,56 @@ let Game = () => {
     let input = document.getElementById("dialogue-input");
     let cancelButton = document.getElementById("dialogue-cancel");
     let submitButton = document.getElementById("dialogue-submit");
+
+    let dSubmit = event => {
+      if (confirm) {
+        if (finish) {
+          App.game.challenge(true);
+        } else {
+          forfeit();
+        }
+
+        outerDiv.classList.add("d-none");
+
+        submitButton.removeEventListener("click", dSubmit);
+      } else {
+        let wildTileValue = input.value.toUpperCase().replace(/[^A-Z]/, '');
+        let lettersToPass = input.value.toUpperCase().replace(/[^A-Z ]/, '');
+
+        if (wT && wildTileValue.length === 1) {
+          outerDiv.classList.add("d-none")
+
+          setLetter(wT[0], wildTileValue);
+          wT[0].lastChild.textContent = 0;
+
+          wildTile = wildTileValue;
+
+          App.game.make_move(wT[0].id + " " + wildTileValue + "*")
+
+          input.value = "";
+
+          if (wT.length > 1) {
+            submitButton.removeEventListener("click", dSubmit);
+
+            wildTile2 = wildTile;
+
+            showDialogue("Enter a letter: ", wT.slice(1, 2));
+          } else {
+            submit();
+
+            submitButton.removeEventListener("click", dSubmit);
+          }
+        } else if (!wT) {
+          outerDiv.classList.add("d-none")
+
+          input.value = "";
+
+          pass(lettersToPass.split(""));
+
+          submitButton.removeEventListener("click", dSubmit);
+        }
+      }
+    }
 
     p.textContent = message;
 
@@ -937,39 +1005,7 @@ let Game = () => {
       outerDiv.classList.add("d-none");
     });
 
-    submitButton.addEventListener("click", event => {
-      if (confirm) {
-        if (finish) {
-          App.game.challenge(true);
-        } else {
-          forfeit();
-        }
-
-        outerDiv.classList.add("d-none");
-      } else {
-        let wildLetterValue = input.value.toUpperCase().replace(/[^A-Z]/, '');
-        let lettersToPass = input.value.toUpperCase().replace(/[^A-Z ]/, '');
-
-        if (wT && wildLetterValue.length === 1) {
-          outerDiv.classList.add("d-none")
-
-          wT.getElementsByTagName("SPAN")[0].textContent = wildLetterValue;
-          wT.getElementsByTagName("SUB")[0].textContent = 0;
-
-          App.game.make_move(wT.id + " " + wildLetterValue + "*")
-
-          input.value = "";
-
-          submit();
-        } else if (!wT) {
-          outerDiv.classList.add("d-none")
-
-          input.value = "";
-
-          pass(lettersToPass.split(""));
-        }
-      }
-    });
+    submitButton.addEventListener("click", dSubmit);
   }
 
   let pass = lettersToPass => {
@@ -1286,14 +1322,24 @@ let Game = () => {
     if (rackTiles.every(rackTile => !rackTile.innerHTML)) {
       // If rack is completely empty, just put the placed tiles back on
       for (let i = 0; i < prevWordTiles.length; i++) {
+        if (getLetter(prevWordTiles[i]) == wildTile) {
+          setLetter(prevWordTiles[i], " ");
+        }
+
         replaceTile(rackTiles[i], prevWordTiles[i]);
       }
     } else {
       // If not completely empty, then should check if replacing the correct letter
       for (let i = 0; i < drawnTiles.length; i++) {
         for (let j = 0; j < rackTiles.length; j++) {
-          if (drawnTiles[i] === rackTiles[j].getElementsByTagName("SPAN")[0].textContent) {
-            replaceTile(rackTiles[i], prevWordTiles[i]);
+          if (drawnTiles[i] === getLetter(rackTiles[j])) {
+            let tile = prevWordTiles.pop();
+
+            if (getLetter(tile) == wildTile) {
+              setLetter(tile, " ");
+            }
+
+            replaceTile(rackTiles[j], tile);
 
             break;
           }
@@ -1313,12 +1359,37 @@ let Game = () => {
         
         if (tile) {
           rackTiles[i].innerHTML = '<span></span><sub></sub>';
-          rackTiles[i].getElementsByTagName('span')[0].textContent = tile == "." ? " " : tile;
-          rackTiles[i].lastChild.textContent = letterPoints[tile];
+          setLetter(rackTiles[i], tile == "." ? " " : tile);
+
+          if (tile != ".") {
+            rackTiles[i].lastChild.textContent = letterPoints[tile];
+          }
+
           determineTileBackground(rackTiles[i]);
         }
       }
     }
+  }
+
+  let resetPlacedWildTile = tile => {
+    if ([wildTile, wildTile2].includes(getLetter(tile))) {
+      if (wildTile == getLetter(tile)) {
+        wildTile = null;
+      } else {
+        wildTile2 = null;
+      }
+
+      setLetter(tile, " ");
+      tile.lastChild.textContent = "";
+    }
+  }
+
+  let getLetter = tile => {
+    return tile.getElementsByTagName("SPAN")[0].textContent;
+  }
+
+  let setLetter = (tile, value) => {
+    tile.getElementsByTagName("SPAN")[0].textContent = value;
   }
 
   /**************************************************
@@ -1346,18 +1417,18 @@ let Game = () => {
   }
 
   let calcLetterBonus = tile => {
-    if (tile.getElementsByTagName('sub')[0].textContent != '0') {
+    if (tile.lastChild.textContent != '0') {
       // Make sure the tile wasn't placed previously. Draggable means it is just placed.
       if (tile.draggable) {
         if (doubleLetterBonus.includes(tile.id)) {
-          return letterPoints[tile.getElementsByTagName('span')[0].textContent] * 2;
+          return letterPoints[getLetter(tile)] * 2;
         } else if (tripleLetterBonus.includes(tile.id)) {
-          return letterPoints[tile.getElementsByTagName('span')[0].textContent] * 3;
+          return letterPoints[getLetter(tile)] * 3;
         } else {
-          return letterPoints[tile.getElementsByTagName('span')[0].textContent];
+          return letterPoints[getLetter(tile)];
         }
       } else {
-        return letterPoints[tile.getElementsByTagName('span')[0].textContent];
+        return letterPoints[getLetter(tile)];
       }
     } else {
       return 0;
@@ -1383,7 +1454,7 @@ let Game = () => {
     if (!ptsLimit) {
       for (let i = 0; i < rackTiles.length; i++) {
         if (rackTiles[i].innerHTML) {
-          pointsToBeDeducted = letterPoints[rackTiles[i].getElementsByTagName("SPAN")[0].textContent];
+          pointsToBeDeducted = letterPoints[getLetter(rackTiles[i])];
           deductedPoints += pointsToBeDeducted;
           totalScore -= pointsToBeDeducted;
         }

@@ -17,8 +17,8 @@ class Bag
     ['D', 'U', 'S', 'L'].each do |l|
       4.times { bag << l }
     end
-
-    ['F', 'H', 'V', 'W', 'Y', 'B', 'C', 'M', 'P', '.'].each do |l|
+  
+    ['W', 'C', 'M', 'F', 'H', 'V', 'Y', 'B', 'P', '.'].each do |l|
       2.times { bag << l }
     end
 
