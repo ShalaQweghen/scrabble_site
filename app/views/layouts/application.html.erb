@@ -22,7 +22,10 @@
       <%= yield %>
     </div>
 
-    <%= render "shared/how_to" %>
+    <% if user_signed_in? %>
+      <%= render "shared/how_to" %>
+    <% end %> 
+    
     <%= render "shared/footer" %>
   </body>
 </html>
