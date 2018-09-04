@@ -1,0 +1,111 @@
+<div id="open-how" class="btn-warning"><%= fa_icon "question", class: "fa-2x" %></div>
+
+<div id="how-outer-div" class="container d-none">
+  <div id="how-inner-div" class="container pb-3 px-5">
+    <div id="how1">
+      <h2>How to Play</h2>
+      <p>Players can click on a tile on their racks (that is, <img width="100" src="rack.png">) or on the board to pick it up and click on an empty to square to place it or on a tile on the board to swap the tiles. Players can also drag and drop the tiles. Right-clicking on a tile placed on the board will return it to the rack. Only the tiles owned by a player is interactive.</p>
+      <p>Using the letters present on their racks, players should make valid words on the board.</p>
+      <p>Empty tiles (that is, <span class="exp-tile" style="background: #BE975B;"></span>) mean that they can be replaced for any letter choosen to suit the word. A dialogue will ask players to pick a letter to be replaced with the empty tile. Their point value is zero.</p>
+
+      <div class="d-flex justify-content-around">
+        <figure class="exp-fig">
+          <img width="200" src="wild-tile.gif">
+          <figcaption>Replacing a wild tile</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div id="how2" class="d-none pt-5">
+      <p>Except for the very first word placed, each word made should be connected or adjacent to at least one other word already present on the board.</p>
+
+      <div class="d-flex justify-content-around flex-wrap">
+        <figure class="exp-fig">
+          <img width="200" src="first-word.gif">
+          <figcaption>The first word</figcaption>
+        </figure>
+
+        <figure class="exp-fig">
+          <img width="200" src="connected-word.gif">
+          <figcaption>A word connected to another word</figcaption>
+        </figure>
+
+        <figure class="exp-fig">
+          <img width="200" src="adjacent-word.gif">
+          <figcaption>A word adjacent to another word</figcaption>
+        </figure>
+      </div>
+      <p>It is possible to make more than one words by placing a word adjacent to a word or words already present on the board. In that case, all the words formed should be valid.</p>
+      <p>After placing a word on the board, it is enough to click on <img width="100" src="submit.png"> button.</p>
+    </div>
+
+    <div id="how3" class="d-none pt-5">
+      <p>If players can't make a word with the letters on their racks or just want to change a letter or several letters, they can click on the <img width="100" src="pass.png"> button and enter the letter(s) they want to change in the dialogue box that opens. Players can also pass their turn without changing any letters by leaving the dialogue empty and clicking submit. This action passes their turn.</p>
+
+      <div class="d-flex justify-content-around">
+        <figure class="exp-fig">
+          <img width="200" src="passing-letters.gif">
+          <figcaption>Passing letters</figcaption>
+        </figure>
+      </div>
+
+      <p>If the challenge mode is turned on, players can challenge each other's last made words by pressing the <img width="100" src="challenge.png"> when it is their turn. If the challenged word is valid, the challenger passes his or her turn. Otherwise, the challenged word is taken off the board and the points are deducted from the challenged's points. The challenger continues his or her turn.</p>
+      <p>It is also possible to set a points limit, a time limit or both at the same time.</p>
+      <p>A game can be forfeited by clicking on <img width="80" src="forfeit.png"> button or closing the tab or window before a game is over.</p>
+    </div>
+
+    <div id="how4" class="d-none pt-5">
+      <p><span class="exp-tile" style="background: #b3c6ff;"></span> => The light blue squares gives the double letter score. That is, the point of the letter placed on the square is doubled. If the letter placed on the light blue square is present in more than one word, its point is doubled for each word.</p>
+      <p><span class="exp-tile" style="background: #3366ff;"></span> => Dark Blue squares gives the triple letter score. That is, the point of the letter placed on the square is tripled. If the letter placed on the Dark Blue square is present in more than one word, its point is tripled for each word.</p>
+      <p><span class="exp-tile" style="background: #ff99cc;"></span> => Pink squares gives the double word score. That is, the total point obtained from the word is doubled. If the Pink square is present in more than one word, the total point for each word is doubled.</p>
+      <p><span class="exp-tile" style="background: #ff3300;"></span> => Red squares gives the triple word score. That is, the total point obtained from the word is tripled. If the Red square is present in more than one word, the total point for each word is tripled.</p>
+    </div>
+
+    <div id="how-buttons">
+      <button id="back" class="btn btn-success">Back</button>
+      <button id="close-how" class="btn btn-primary">Close</button>
+      <button id="next" class="btn btn-success">Next</button>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  let backButton = document.getElementById("back");
+  let nextButton = document.getElementById("next");
+  let closeButton = document.getElementById("close-how");
+  let openButton = document.getElementById("open-how");
+  let howTo = document.getElementById("how-outer-div");
+  let count = 1;
+
+  backButton.addEventListener("click", event => {
+    if (count > 1) {
+      let toHide = document.getElementById("how" + count);
+      count -= 1;
+      let toShow = document.getElementById("how" + count);
+
+      toHide.classList.add("d-none");
+      toShow.classList.remove("d-none");
+    }
+  })
+
+  nextButton.addEventListener("click", event => {
+    if (count < 4) {
+      let toHide = document.getElementById("how" + count);
+      count += 1;
+      let toShow = document.getElementById("how" + count);
+
+      toHide.classList.add("d-none");
+      toShow.classList.remove("d-none");
+    }
+  })
+
+  openButton.addEventListener("click", event => {
+    howTo.classList.remove("d-none");
+    openButton.classList.add("d-none");
+  })
+
+  closeButton.addEventListener("click", event => {
+    howTo.classList.add("d-none");
+    openButton.classList.remove("d-none");
+  })
+</script>

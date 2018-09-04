@@ -226,7 +226,7 @@ let Game = () => {
       let rackTile = rackTiles.find(tile => tile.textContent[0] === passedLetters[i]);
       setLetter(rackTile, letters[i]);
 
-      if (letter != " ") {
+      if (letters[i] != " ") {
         rackTile.lastChild.textContent = letterPoints[letters[i]];
       }
     }
@@ -406,6 +406,8 @@ let Game = () => {
 
             rackTile.innerHTML = target.innerHTML;
             target.innerHTML = '';
+
+            App.game.remove_tile(target.id);
 
             determineTileBackground(rackTile);
             determineTileBackground(target);
@@ -1028,6 +1030,10 @@ let Game = () => {
       removeTilesFromBoard();
 
       App.game.pass_letters(lettersToPass);
+    } else {
+      passes += 1;
+      
+      App.game.switch_turn(0, passes);
     }
   }
 
