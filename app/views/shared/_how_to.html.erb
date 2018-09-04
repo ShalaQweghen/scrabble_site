@@ -70,42 +70,44 @@
 </div>
 
 <script type="text/javascript">
-  let backButton = document.getElementById("back");
-  let nextButton = document.getElementById("next");
-  let closeButton = document.getElementById("close-how");
-  let openButton = document.getElementById("open-how");
-  let howTo = document.getElementById("how-outer-div");
-  let count = 1;
+  (function() {
+    let backButton = document.getElementById("back");
+    let nextButton = document.getElementById("next");
+    let closeButton = document.getElementById("close-how");
+    let openButton = document.getElementById("open-how");
+    let howTo = document.getElementById("how-outer-div");
+    let count = 1;
 
-  backButton.addEventListener("click", event => {
-    if (count > 1) {
-      let toHide = document.getElementById("how" + count);
-      count -= 1;
-      let toShow = document.getElementById("how" + count);
+    backButton.addEventListener("click", event => {
+      if (count > 1) {
+        let toHide = document.getElementById("how" + count);
+        count -= 1;
+        let toShow = document.getElementById("how" + count);
 
-      toHide.classList.add("d-none");
-      toShow.classList.remove("d-none");
-    }
-  })
+        toHide.classList.add("d-none");
+        toShow.classList.remove("d-none");
+      }
+    })
 
-  nextButton.addEventListener("click", event => {
-    if (count < 4) {
-      let toHide = document.getElementById("how" + count);
-      count += 1;
-      let toShow = document.getElementById("how" + count);
+    nextButton.addEventListener("click", event => {
+      if (count < 4) {
+        let toHide = document.getElementById("how" + count);
+        count += 1;
+        let toShow = document.getElementById("how" + count);
 
-      toHide.classList.add("d-none");
-      toShow.classList.remove("d-none");
-    }
-  })
+        toHide.classList.add("d-none");
+        toShow.classList.remove("d-none");
+      }
+    })
 
-  openButton.addEventListener("click", event => {
-    howTo.classList.remove("d-none");
-    openButton.classList.add("d-none");
-  })
+    openButton.addEventListener("click", event => {
+      howTo.classList.remove("d-none");
+      openButton.classList.add("d-none");
+    })
 
-  closeButton.addEventListener("click", event => {
-    howTo.classList.add("d-none");
-    openButton.classList.remove("d-none");
-  })
+    closeButton.addEventListener("click", event => {
+      howTo.classList.add("d-none");
+      openButton.classList.remove("d-none");
+    })
+  })();
 </script>
