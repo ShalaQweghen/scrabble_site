@@ -1,0 +1,45 @@
+<!-- <div id="words-made" class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle btn-sm mr-2 mb-1" role="button" id="dropdownMenuLinkWords" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Words
+  </button>
+
+  <div id="words-area" class="dropdown-menu" aria-labelledby="dropdownMenuLinkWords">
+  </div>
+</div>
+
+<script type="text/javascript">
+  function getMeanings() {
+    let words = document.getElementsByClassName("undefined");
+
+    for (let i = 0; i < words.length; i++) {
+      var xhr = new XMLHttpRequest();
+
+      xhr.onload = e => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            let parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xhr.responseText, "text/xml");
+
+            console.log(xhr.responseText);
+
+            let defs = xmlDoc.getElementsByTagName("dt")[0].childNodes[0];
+
+            let div = document.createElement("div");
+            div.classList.add("definition");
+            //div.classList.add("d-none");
+            div.id = words[i].textContent;
+            div.textContent = defs.nodeValue;
+
+            document.body.appendChild(div);
+
+            words[i].classList.remove("undefined");
+          }
+        }
+      }
+
+      xhr.open("GET", 'https://www.dictionaryapi.com/api/v1/references/collegiate/xml/' + words[i].textContent + '?key=3a7e5432-9127-4ea1-8a11-5e975821adbd', true);
+
+      xhr.send(null);
+    }
+  }
+</script> -->

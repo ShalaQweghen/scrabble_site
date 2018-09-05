@@ -85,7 +85,7 @@ class Game < ApplicationRecord
     end
 
     if is_validated
-      ActionCable.server.broadcast "game-#{game_id}", { action: "process_valid_words", msg: ". #{user}" }
+      ActionCable.server.broadcast "game-#{game_id}", { action: "process_valid_words", msg: ". #{user} #{words["data"].gsub(" ", "</sub><sub-class='meaning-undefined'>")}" }
     end
   end
 

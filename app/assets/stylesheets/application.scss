@@ -207,6 +207,14 @@ textarea + input {
   color: white;
 }
 
+.meaning {
+  display: block;
+  font-size: 1em;
+  height: 20px;
+  padding: 5px 10px;
+  cursor: help;
+}
+
 /* users#show */
 
 .status {
@@ -238,7 +246,7 @@ textarea + input {
 
 /* Online Users */
 
-#online-users-area {
+#online-users-area, #words-area {
   overflow-y: auto;
   max-height: 12.5rem; /* 200px */
 }
