@@ -220,13 +220,14 @@ let Game = () => {
   let passLetters = letters => {
     passes += 1;
 
-    letters = letters.replace(/\./g, ' ').split("")
+    letters = letters.replace(/\./g, " ").split("");
 
     for (let i = 0; i < letters.length; i++) {
       let rackTile = rackTiles.find(tile => tile.textContent[0] === passedLetters[i]);
+
       setLetter(rackTile, letters[i]);
 
-      if (letters[i] != " ") {
+      if (getLetter(rackTile) != " ") {
         rackTile.lastChild.textContent = letterPoints[letters[i]];
       }
     }
@@ -1024,15 +1025,15 @@ let Game = () => {
 
     lettersToPass = lettersToPass.filter(letter => letter);
 
+    removeTilesFromBoard();
+
     if (lettersToPass.length) {
       passedLetters = lettersToPass;
-
-      removeTilesFromBoard();
 
       App.game.pass_letters(lettersToPass);
     } else {
       passes += 1;
-      
+
       App.game.switch_turn(0, passes);
     }
   }

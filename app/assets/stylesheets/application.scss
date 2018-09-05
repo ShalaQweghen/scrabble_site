@@ -367,4 +367,14 @@ textarea + input {
   .footer {
     font-size: 0.7rem;
   }
+
+  #open-how {
+    width: 30px;
+    height: 30px;
+    padding-top: 3px;
+  }
+
+  #open-how > i {
+    font-size: 1.5em;
+  }
 }

@@ -64,9 +64,6 @@ window.onload = () ->
           if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.processInvalidWords(word)
 
-          if App.gamePlay.getPlayerId() != playerId
-            @printMessage("Your turn...")
-
         when "challenge"
           [last, playerId] = data.msg.split(" ")
 
