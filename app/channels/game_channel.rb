@@ -59,11 +59,11 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def register_scores(data)
-    Game.register_scores(current_user, @game, data)
+    Game.register_scores(current_user, @game.reload, data)
   end
 
   def forfeit(data)
-    Game.forfeit(current_user, @game, data)
+    Game.forfeit(current_user, @game.reload, data)
   end
 
   def transmit_chat(data)
