@@ -210,9 +210,22 @@ textarea + input {
 .meaning {
   display: block;
   font-size: 1em;
-  height: 20px;
-  padding: 5px 10px;
-  cursor: help;
+  padding: 15px 10px;
+  cursor: crosshair;
+}
+
+.meaning:nth-of-type(odd) {
+  background: #f2f2f2;
+}
+
+.definition {
+  position: absolute;
+  top: -1000px;
+  left: -1000px;
+  padding: 20px;
+  z-index: 1000;
+  background: #ecffe2;
+  border-radius: 10px;
 }
 
 /* users#show */

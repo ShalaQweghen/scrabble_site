@@ -1,0 +1,1 @@
+MEANINGS = File.open("./vendor/defs.txt").read.split("\n").map { |line| line.split("§") }.to_h

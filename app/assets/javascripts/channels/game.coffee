@@ -53,12 +53,13 @@ window.onload = () ->
             App.gamePlay.passLetters(letters)
 
         when "process_valid_words"
-          [word, playerId, words] = data.msg.split(" ")
+          [playerId, words, defs] = data.msg.split(" ")
+
+          @addWords(words.replace(/§/g, " "))
+          @addDefinitions(defs.replace(/§/g, " "))
 
           if App.gamePlay.getPlayerId() == playerId
             App.gamePlay.processValidWords()
-
-          // @addWords("<sub class='meaning undefined'>" + words.replace(/-/g, " ") + "</sub>")
 
         when "process_invalid_words"
           [word, playerId] = data.msg.split(" ")
@@ -135,7 +136,8 @@ window.onload = () ->
     transmitChat: (message) ->
       @perform 'transmit_chat', data: message
 
-    // addWords: (words) ->
-    //   document.getElementById("words-area").innerHTML += words
+    addWords: (words) ->
+      document.getElementById("words-area").innerHTML += words
 
-    //   getMeanings();
+    addDefinitions: (defs) ->
+      document.getElementsByTagName("NAV")[0].innerHTML += defs

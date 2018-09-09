@@ -85,7 +85,20 @@ class Game < ApplicationRecord
     end
 
     if is_validated
-      ActionCable.server.broadcast "game-#{game_id}", { action: "process_valid_words", msg: ". #{user} #{words["data"].gsub(" ", "</sub><sub-class='meaning-undefined'>")}" }
+      words_to_check = words["data"].split(" ")
+      subs = ""
+      defs = ""
+
+      words_to_check.each do |word|
+        definition = MEANINGS[word]
+
+        if definition
+          subs += "<sub class='meaning' onmouseenter='handleMouseEnter(event)' onmouseleave='handleMouseLeave(event)'>#{word}</sub>"
+          defs += "<div class='definition' id='#{word}'>#{definition}</div>"
+        end
+      end
+
+      ActionCable.server.broadcast "game-#{game_id}", { action: "process_valid_words", msg: "#{user} #{subs.gsub(" ", "§")} #{defs.gsub(" ", "§")}" }
     end
   end
 
