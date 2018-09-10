@@ -138,6 +138,8 @@ let Game = () => {
     } else {
       chatArea.value += '\n' + opponentName + ": " + message.replace(/[•]/g, ' ');;
     }
+
+    chatArea.scrollTo(0, 100000);
   }
 
   let placeTile = (id, letter) => {
@@ -519,6 +521,8 @@ let Game = () => {
         }
         
         chatInput.value = ""; 
+
+        chatArea.scrollTo(0, 100000);
       }
     });
   }
